@@ -22,7 +22,7 @@ namespace dabip {
 
     std::uint8_t static constexpr kdata_group_types[] {0, 1, 2};
     byte_vector_t m_last_ip_datagram {};
-    std::uint8_t m_continuity_index {};
+    std::uint8_t m_continuity_index {15};
     std::uint8_t m_repetition_index {};
   };
 

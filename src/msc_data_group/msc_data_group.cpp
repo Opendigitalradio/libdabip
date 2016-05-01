@@ -12,7 +12,7 @@ namespace dabip {
   byte_vector_t msc_data_group_generator::build_msc_data_group_header()
     {
     auto header = byte_vector_t(2);
-    header[0]  = 1 << 7;  //Extension flag
+    header[0]  = 0 << 7;  //Extension flag
     header[0] |= 1 << 6;  //CRC flag
     header[0] |= 0 << 5;  //Segmentation flag
     header[0] |= 0 << 4;  //User access flag
