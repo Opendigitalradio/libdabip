@@ -6,7 +6,7 @@
 
 namespace dabip {
   using byte_vector_t = std::vector<std::uint8_t>;
-
+  using pair_complete_vector_t = std::pair<bool, byte_vector_t>;
 }
 
 
