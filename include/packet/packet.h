@@ -73,6 +73,7 @@ namespace dabip
 
     private:
     std::uint16_t const kAddress;
+    bool m_group_valid {true};
     byte_vector_t m_msc_data_group {};
     };
 
