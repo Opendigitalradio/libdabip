@@ -6,7 +6,7 @@
 
 namespace dabip {
 
-  byte_vector_t packet_generator::build_packets(byte_vector_t & msc_data_group)
+  byte_vector_t packet_generator::build(byte_vector_t & msc_data_group)
     {
     auto len = msc_data_group.size();
 
@@ -22,35 +22,35 @@ namespace dabip {
         packet_generator::m_first_last = 00_b;
         }
       auto parts = split_vector(msc_data_group, packet_length);
-      auto hd_packets = packet_generator::assemble_packets(parts.first, packet_length);
-      auto tl_packets = packet_generator::build_packets(parts.second);
+      auto hd_packets = packet_generator::assemble(parts.first, packet_length);
+      auto tl_packets = packet_generator::build(parts.second);
       return concat_vectors(hd_packets, tl_packets);
       }
     else if (len > packet_generator::kpacket_data_lengths[2])
       {
       packet_generator::set_first_last();
-      return packet_generator::assemble_packets(msc_data_group, packet_generator::kpacket_lengths[3]);
+      return packet_generator::assemble(msc_data_group, packet_generator::kpacket_lengths[3]);
       }
     else if (len > packet_generator::kpacket_data_lengths[1])
       {
       packet_generator::set_first_last();
-      return packet_generator::assemble_packets(msc_data_group, packet_generator::kpacket_lengths[2]);
+      return packet_generator::assemble(msc_data_group, packet_generator::kpacket_lengths[2]);
       }
     else if (len > packet_generator::kpacket_data_lengths[0])
       {
       packet_generator::set_first_last();
-      return packet_generator::assemble_packets(msc_data_group, packet_generator::kpacket_lengths[1]);
+      return packet_generator::assemble(msc_data_group, packet_generator::kpacket_lengths[1]);
       }
     else
       {
       packet_generator::set_first_last();
-      return packet_generator::assemble_packets(msc_data_group, packet_generator::kpacket_lengths[0]);
+      return packet_generator::assemble(msc_data_group, packet_generator::kpacket_lengths[0]);
 
       }
 
     }
 
-  byte_vector_t packet_generator::build_packet_header(std::uint8_t const packet_length, std::uint8_t const useful_data_lenght)
+  byte_vector_t packet_generator::build_header(std::uint8_t const packet_length, std::uint8_t const useful_data_lenght)
     {
     auto header = byte_vector_t{0, 0, 0};
     // Packet length:
@@ -96,12 +96,12 @@ namespace dabip {
       }
     }
 
-  byte_vector_t packet_generator::assemble_packets(byte_vector_t & msc_data_group, std::uint8_t packet_length)
+  byte_vector_t packet_generator::assemble(byte_vector_t & msc_data_group, std::uint8_t packet_length)
     {
     auto packets = byte_vector_t(packet_length);
-    auto header = packet_generator::build_packet_header(packet_length, msc_data_group.size());
+    auto header = packet_generator::build_header(packet_length, msc_data_group.size());
 
-    auto frame = concat_vectors(packets, header, msc_data_group);
+    concat_vectors_inplace(packets, header, msc_data_group);
     auto crc = genCRC16(packets);
     packets.reserve(packets.size()+2);
     return concat_vectors(packets, crc);
