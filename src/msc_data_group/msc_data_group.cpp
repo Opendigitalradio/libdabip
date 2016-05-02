@@ -6,6 +6,7 @@
 #include "util/vector_helpers.h"
 #include "common/common_types.h"
 #include "common/common_literals.h"
+#include "constants/msc_data_group_constants.h"
 
 
 namespace dabip {
@@ -19,7 +20,7 @@ namespace dabip {
     header[0] |= 1 << 6;  //CRC flag
     header[0] |= 0 << 5;  //Segmentation flag
     header[0] |= 0 << 4;  //User access flag
-    header[1]  = msc_data_group_generator::kdata_group_types[0];    //Data group type
+    header[1]  = constants::kDataGroupTypes[0];    //Data group type
     header[1] |= msc_data_group_generator::m_continuity_index << 4; //Continuity index
     header[1] |= msc_data_group_generator::m_repetition_index;      //Repetition index
     return header;
@@ -44,7 +45,7 @@ namespace dabip {
     return header;
     }
 
-
+// TODO handle failed CRC ignore group??
   pair_complete_vector_t msc_data_group_parser::parse(byte_vector_t & msc_data_group)
     {
     byte_vector_t msc_dg_without_crc {msc_data_group};
@@ -57,6 +58,8 @@ namespace dabip {
       if(genCRC16(parts.first)!=parts.second)
         {
         msc_data_group_parser::m_valid = false;
+        msc_data_group_parser::m_ip_datagram.clear();
+        //TODO set segmentation false
         return pair_complete_vector_t{true, byte_vector_t{}};
         }
       else
@@ -78,7 +81,10 @@ namespace dabip {
       {
       std::uint16_t segment_field_int = msc_dg_without_crc[header_size] << 8 | msc_dg_without_crc[header_size+1];
       segment_field = std::bitset<16>{segment_field_int};
-      msc_data_group_parser::m_segmented = !segment_field[15]; //Last segment flag
+      if(segment_field[15]) //Last segment flag
+        {
+        m_segmented = false;
+        }
       //TODO track segment number
       header_size += 2;
       }

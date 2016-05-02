@@ -5,9 +5,11 @@
 
 #include "common/common_types.h"
 
-namespace dabip {
+namespace dabip
+  {
 
-  struct msc_data_group_generator {
+  struct msc_data_group_generator
+    {
 
     /**
      * @author Tobias Stauber
@@ -21,21 +23,21 @@ namespace dabip {
     private:
     byte_vector_t build_header();
 
-    std::uint8_t static constexpr kdata_group_types[] {0, 1, 2};
     byte_vector_t m_last_ip_datagram {};
     std::uint8_t m_continuity_index {15};
     std::uint8_t m_repetition_index {};
   };
 
 
-  struct msc_data_group_parser {
+  struct msc_data_group_parser
+    {
 
     /**
      * @author Tobias Stauber
      *
      * @brief Parses msc_data_groups.
      * @param msc_data_group A MSC data group.
-     * @return A flag, if the set of segments is complete as first and the ip_datagram if successful, else an empty byte_vector_t as second.
+     * @return A flag, if the set of segments is complete as first and if successful, the ip_datagram else an empty byte_vector_t as second.
      */
     pair_complete_vector_t parse(byte_vector_t & msc_data_group);
 
@@ -50,7 +52,7 @@ namespace dabip {
     /**
      * @author Tobias Stauber
      *
-     * @return Missed msc_data_group since last feed.
+     * @return Missed msc_data_group since last fed.
      *
      */
     std::uint8_t no_of_missing_data_groups() const;

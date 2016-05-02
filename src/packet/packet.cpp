@@ -3,6 +3,7 @@
 #include "util/vector_helpers.h"
 #include "packet/packet.h"
 #include "common/common_types.h"
+#include "constants/packet_constants.h"
 
 namespace dabip {
 
@@ -10,9 +11,9 @@ namespace dabip {
     {
     auto len = msc_data_group.size();
 
-    if(len > packet_generator::kpacket_data_lengths[3])
+    if(len > constants::kPacketDataLengths[3])
       {
-      auto packet_length = packet_generator::kpacket_data_lengths[3];
+      auto packet_length = constants::kPacketDataLengths[3];
       if(packet_generator::m_first_last == 01_b || packet_generator::m_first_last == 11_b)
         {
         packet_generator::m_first_last = 10_b;
@@ -26,25 +27,25 @@ namespace dabip {
       auto tl_packets = packet_generator::build(parts.second);
       return concat_vectors(hd_packets, tl_packets);
       }
-    else if (len > packet_generator::kpacket_data_lengths[2])
+    else if (len > constants::kPacketDataLengths[2])
       {
       packet_generator::set_first_last();
-      return packet_generator::assemble(msc_data_group, packet_generator::kpacket_lengths[3]);
+      return packet_generator::assemble(msc_data_group, constants::kPacketLengths[3]);
       }
-    else if (len > packet_generator::kpacket_data_lengths[1])
+    else if (len > constants::kPacketDataLengths[1])
       {
       packet_generator::set_first_last();
-      return packet_generator::assemble(msc_data_group, packet_generator::kpacket_lengths[2]);
+      return packet_generator::assemble(msc_data_group, constants::kPacketLengths[2]);
       }
-    else if (len > packet_generator::kpacket_data_lengths[0])
+    else if (len > constants::kPacketDataLengths[0])
       {
       packet_generator::set_first_last();
-      return packet_generator::assemble(msc_data_group, packet_generator::kpacket_lengths[1]);
+      return packet_generator::assemble(msc_data_group, constants::kPacketLengths[1]);
       }
     else
       {
       packet_generator::set_first_last();
-      return packet_generator::assemble(msc_data_group, packet_generator::kpacket_lengths[0]);
+      return packet_generator::assemble(msc_data_group, constants::kPacketLengths[0]);
 
       }
 
@@ -56,16 +57,16 @@ namespace dabip {
     // Packet length:
     switch(packet_length)
       {
-      case packet_generator::kpacket_lengths[3]:
+      case constants::kPacketLengths[3]:
         header[0] = 11_b;
         break;
-      case packet_generator::kpacket_lengths[2]:
+      case constants::kPacketLengths[2]:
         header[0] = 10_b;
         break;
-      case packet_generator::kpacket_lengths[1]:
+      case constants::kPacketLengths[1]:
         header[0] = 01_b;
         break;
-      case packet_generator::kpacket_lengths[0]:
+      case constants::kPacketLengths[0]:
         header[0] = 00_b;
         break;
       }
@@ -75,8 +76,8 @@ namespace dabip {
     // First/Last:
     header[0] |= packet_generator::m_first_last << 2;
     // Address:
-    header[0] |= 00000011_b & (packet_generator::kaddress >> 8);
-    header[1] = packet_generator::kaddress;
+    header[0] |= 00000011_b & (packet_generator::kAddress >> 8);
+    header[1] = packet_generator::kAddress;
     // Command:
     header[2] = 0_b << 7;
     // Useful data length:

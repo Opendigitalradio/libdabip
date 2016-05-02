@@ -6,14 +6,13 @@
 #include "common/common_literals.h"
 #include "common/common_types.h"
 
-namespace dabip {
-
+namespace dabip
+  {
   using namespace binary;
-  struct packet_generator {
+  struct packet_generator
+    {
 
-    packet_generator(uint16_t address):kaddress{address}
-      {
-      }
+    packet_generator(uint16_t address);
 
     /**
      * @author Tobias Stauber
@@ -22,7 +21,7 @@ namespace dabip {
      *
      *
      */
-    byte_vector_t build_packets(byte_vector_t & msc_data_group);
+    byte_vector_t build(byte_vector_t & msc_data_group);
 
     private:
 
@@ -33,7 +32,7 @@ namespace dabip {
      *
      *
      */
-    byte_vector_t build_packet_header(std::uint8_t const packet_length, std::uint8_t const useful_data_length);
+    byte_vector_t build_header(std::uint8_t const packet_length, std::uint8_t const useful_data_length);
 
     /**
      * @author Tobias Stauber
@@ -42,16 +41,40 @@ namespace dabip {
      *
      *
      */
-    byte_vector_t assemble_packets(byte_vector_t & msc_data_group, std::uint8_t packet_length);
+    byte_vector_t assemble(byte_vector_t & msc_data_group, std::uint8_t packet_length);
 
     void set_first_last();
 
     std::uint8_t m_first_last = 11_b;
-    std::uint16_t const kaddress;
+    std::uint16_t const kAddress;
     std::uint8_t m_continuity_index {};
-    std::uint8_t static constexpr kpacket_lengths[] {24, 48, 72, 96};
-    std::uint8_t static constexpr kpacket_data_lengths[] {kpacket_lengths[0]-5, kpacket_lengths[1]-5, kpacket_lengths[2]-5, kpacket_lengths[3]-5};
-  };
+    };
+
+  struct packet_parser
+    {
+    packet_parser(uint16_t address);
+
+    /**
+     * @author Tobias Stauber
+     *
+     * @brief parses dab packets
+     * @return A flag, if the set of segments is complete as first and if successful && address==kAddress the msc_data_group else an empty byte_vector_t as second.
+     */
+    pair_complete_vector_t parse(byte_vector_t & packet);
+
+    bool is_valid() const;
+
+    /**
+     * @author Tobias Stauber
+     *
+     * @return Number of missed packets since last fed.
+     */
+    std::uint8_t no_of_missing_packets() const;
+
+    private:
+    std::uint16_t const kAddress;
+    byte_vector_t m_msc_data_group {};
+    };
 
 }
 
