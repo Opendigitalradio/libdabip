@@ -5,8 +5,18 @@
 #include <cstdint>
 
 namespace dabip {
+
+  enum parse_status
+    {
+    invalid_crc,
+    invalid_address,
+    incomplete,
+    segment_lost,
+    ok
+    };
+
   using byte_vector_t = std::vector<std::uint8_t>;
-  using pair_complete_vector_t = std::pair<bool, byte_vector_t>;
+  using pair_status_vector_t = std::pair<parse_status, byte_vector_t>;
 }
 
 

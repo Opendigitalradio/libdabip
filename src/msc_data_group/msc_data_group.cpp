@@ -13,7 +13,7 @@ namespace dabip {
 
   using namespace binary;
 
-  byte_vector_t build_header()
+  byte_vector_t msc_data_group_generator::build_header()
     {
     auto header = byte_vector_t(2);
     header[0]  = 0 << 7;  //Extension flag
@@ -46,7 +46,7 @@ namespace dabip {
     }
 
 // TODO handle failed CRC ignore group??
-  pair_complete_vector_t parse(byte_vector_t & msc_data_group)
+  pair_status_vector_t msc_data_group_parser::parse(byte_vector_t & msc_data_group)
     {
     byte_vector_t msc_dg_without_crc {msc_data_group};
     std::uint8_t header_size {2};
@@ -60,7 +60,7 @@ namespace dabip {
         m_valid = false;
         m_ip_datagram.clear();
         //TODO set segmentation false
-        return pair_complete_vector_t{true, byte_vector_t{}};
+        return pair_status_vector_t{parse_status::invalid_crc, byte_vector_t{}};
         }
       else
         {
@@ -103,12 +103,12 @@ namespace dabip {
     if(m_segmented)
       {
       concat_vectors_inplace(m_ip_datagram, ip_datagram);
-      return pair_complete_vector_t{false, byte_vector_t{}};
+      return pair_status_vector_t{parse_status::incomplete, byte_vector_t{}};
       }
     else
       {
       m_ip_datagram.clear();
-      return pair_complete_vector_t{true, ip_datagram};
+      return pair_status_vector_t{parse_status::ok, ip_datagram};
       }
     }
 

@@ -1,4 +1,5 @@
 #include <bitset>
+#include <cstdint>
 
 #include "util/crc16.h"
 #include "util/vector_helpers.h"
@@ -8,7 +9,7 @@
 
 namespace dabip {
 
-  packet_generator(std::uint16_t address): kAddress{address}
+  packet_generator::packet_generator(std::uint16_t address) : kAddress{address}
     {
     }
 
@@ -118,13 +119,13 @@ namespace dabip {
     {
     }
 
-  pair_complete_vector_t packet_parser::parse(byte_vector_t & packet)
+  pair_status_vector_t packet_parser::parse(byte_vector_t & packet)
     {
     std::bitset<6> header_flags(packet[0] << 2);
     std::uint16_t address = (packet[0] & 11_b) << 8 | packet[1];
     if(address != kAddress)
       {
-      return pair_complete_vector_t{true, byte_vector_t{}};
+      return pair_status_vector_t{parse_status::invalid_address, byte_vector_t{}};
       }
     }
 
