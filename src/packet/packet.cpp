@@ -1,3 +1,4 @@
+#include <bitset>
 
 #include "util/crc16.h"
 #include "util/vector_helpers.h"
@@ -7,6 +8,10 @@
 
 namespace dabip {
 
+  packet_generator(std::uint16_t address): kAddress{address}
+    {
+    }
+
   byte_vector_t packet_generator::build(byte_vector_t & msc_data_group)
     {
     auto len = msc_data_group.size();
@@ -14,38 +19,38 @@ namespace dabip {
     if(len > constants::kPacketDataLengths[3])
       {
       auto packet_length = constants::kPacketDataLengths[3];
-      if(packet_generator::m_first_last == 01_b || packet_generator::m_first_last == 11_b)
+      if(m_first_last == 01_b || m_first_last == 11_b)
         {
-        packet_generator::m_first_last = 10_b;
+        m_first_last = 10_b;
         }
-      else if(packet_generator::m_first_last == 10_b)
+      else if(m_first_last == 10_b)
         {
-        packet_generator::m_first_last = 00_b;
+        m_first_last = 00_b;
         }
       auto parts = split_vector(msc_data_group, packet_length);
-      auto hd_packets = packet_generator::assemble(parts.first, packet_length);
-      auto tl_packets = packet_generator::build(parts.second);
+      auto hd_packets = assemble(parts.first, packet_length);
+      auto tl_packets = build(parts.second);
       return concat_vectors(hd_packets, tl_packets);
       }
     else if (len > constants::kPacketDataLengths[2])
       {
-      packet_generator::set_first_last();
-      return packet_generator::assemble(msc_data_group, constants::kPacketLengths[3]);
+      set_first_last();
+      return assemble(msc_data_group, constants::kPacketLengths[3]);
       }
     else if (len > constants::kPacketDataLengths[1])
       {
-      packet_generator::set_first_last();
-      return packet_generator::assemble(msc_data_group, constants::kPacketLengths[2]);
+      set_first_last();
+      return assemble(msc_data_group, constants::kPacketLengths[2]);
       }
     else if (len > constants::kPacketDataLengths[0])
       {
-      packet_generator::set_first_last();
-      return packet_generator::assemble(msc_data_group, constants::kPacketLengths[1]);
+      set_first_last();
+      return assemble(msc_data_group, constants::kPacketLengths[1]);
       }
     else
       {
-      packet_generator::set_first_last();
-      return packet_generator::assemble(msc_data_group, constants::kPacketLengths[0]);
+      set_first_last();
+      return assemble(msc_data_group, constants::kPacketLengths[0]);
 
       }
 
@@ -71,13 +76,13 @@ namespace dabip {
         break;
       }
     // Continuity index:
-    header[0] |= packet_generator::m_continuity_index << 4;
-    packet_generator::m_continuity_index = (packet_generator::m_continuity_index + 1)%4;
+    header[0] |= m_continuity_index << 4;
+    m_continuity_index = (m_continuity_index + 1)%4;
     // First/Last:
-    header[0] |= packet_generator::m_first_last << 2;
+    header[0] |= m_first_last << 2;
     // Address:
-    header[0] |= 00000011_b & (packet_generator::kAddress >> 8);
-    header[1] = packet_generator::kAddress;
+    header[0] |= 00000011_b & (kAddress >> 8);
+    header[1] = kAddress;
     // Command:
     header[2] = 0_b << 7;
     // Useful data length:
@@ -87,20 +92,20 @@ namespace dabip {
 
   void packet_generator::set_first_last()
     {
-    if(packet_generator::m_first_last == 00_b || packet_generator::m_first_last == 10_b)
+    if(m_first_last == 00_b || m_first_last == 10_b)
       {
-      packet_generator::m_first_last = 01_b;
+      m_first_last = 01_b;
       }
     else
       {
-      packet_generator::m_first_last = 11_b;
+      m_first_last = 11_b;
       }
     }
 
   byte_vector_t packet_generator::assemble(byte_vector_t & msc_data_group, std::uint8_t packet_length)
     {
     auto packets = byte_vector_t(packet_length);
-    auto header = packet_generator::build_header(packet_length, msc_data_group.size());
+    auto header = build_header(packet_length, msc_data_group.size());
 
     concat_vectors_inplace(packets, header, msc_data_group);
     auto crc = genCRC16(packets);
@@ -109,6 +114,23 @@ namespace dabip {
     }
 
 
+  packet_parser::packet_parser(std::uint16_t address): kAddress{address}
+    {
+    }
 
+  pair_complete_vector_t packet_parser::parse(byte_vector_t & packet)
+    {
+    std::bitset<6> header_flags(packet[0] << 2);
+    std::uint16_t address = (packet[0] & 11_b) << 8 | packet[1];
+    if(address != kAddress)
+      {
+      return pair_complete_vector_t{true, byte_vector_t{}};
+      }
+    }
+
+  bool packet_parser::is_valid() const
+    {
+    //TODO implement
+    }
 
 }
