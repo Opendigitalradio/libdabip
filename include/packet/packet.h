@@ -60,7 +60,7 @@ namespace dabip
      * @brief parses dab packets
      * @return A flag, if the set of segments is complete as first and if successful && address==kAddress the msc_data_group else an empty byte_vector_t as second.
      */
-    pair_complete_vector_t parse(byte_vector_t & packet);
+    pair_status_vector_t parse(byte_vector_t & packet);
 
     bool is_valid() const;
 

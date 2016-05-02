@@ -39,7 +39,7 @@ namespace dabip
      * @param msc_data_group A MSC data group.
      * @return A flag, if the set of segments is complete as first and if successful, the ip_datagram else an empty byte_vector_t as second.
      */
-    pair_complete_vector_t parse(byte_vector_t & msc_data_group);
+    pair_status_vector_t parse(byte_vector_t & msc_data_group);
 
     /**
      * @author Tobias Stauber
