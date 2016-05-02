@@ -13,7 +13,7 @@ namespace dabip {
 
   using namespace binary;
 
-  byte_vector_t msc_data_group_generator::build_header()
+  byte_vector_t build_header()
     {
     auto header = byte_vector_t(2);
     header[0]  = 0 << 7;  //Extension flag
@@ -21,24 +21,24 @@ namespace dabip {
     header[0] |= 0 << 5;  //Segmentation flag
     header[0] |= 0 << 4;  //User access flag
     header[1]  = constants::kDataGroupTypes[0];    //Data group type
-    header[1] |= msc_data_group_generator::m_continuity_index << 4; //Continuity index
-    header[1] |= msc_data_group_generator::m_repetition_index;      //Repetition index
+    header[1] |= m_continuity_index << 4; //Continuity index
+    header[1] |= m_repetition_index;      //Repetition index
     return header;
     }
 
   byte_vector_t msc_data_group_generator::build(byte_vector_t & ip_datagram)
     {
-    if(ip_datagram != msc_data_group_generator::m_last_ip_datagram)
+    if(ip_datagram != m_last_ip_datagram)
       {
-      msc_data_group_generator::m_continuity_index = (msc_data_group_generator::m_continuity_index + 1) % 16;
-      msc_data_group_generator::m_repetition_index = 0;
+      m_continuity_index = (m_continuity_index + 1) % 16;
+      m_repetition_index = 0;
       }
     else
       {
-      msc_data_group_generator::m_repetition_index > 0 ? msc_data_group_generator::m_repetition_index-- : m_repetition_index = 0;
+      m_repetition_index > 0 ? m_repetition_index-- : m_repetition_index = 0;
       }
-    msc_data_group_generator::m_last_ip_datagram = ip_datagram;
-    auto header = msc_data_group_generator::build_header();
+    m_last_ip_datagram = ip_datagram;
+    auto header = build_header();
     concat_vectors_inplace(header, ip_datagram);
     auto crc = genCRC16(header);
     concat_vectors_inplace(header, crc);
@@ -46,7 +46,7 @@ namespace dabip {
     }
 
 // TODO handle failed CRC ignore group??
-  pair_complete_vector_t msc_data_group_parser::parse(byte_vector_t & msc_data_group)
+  pair_complete_vector_t parse(byte_vector_t & msc_data_group)
     {
     byte_vector_t msc_dg_without_crc {msc_data_group};
     std::uint8_t header_size {2};
@@ -57,20 +57,20 @@ namespace dabip {
       auto parts = split_vector(msc_data_group, msc_data_group.size()-2);
       if(genCRC16(parts.first)!=parts.second)
         {
-        msc_data_group_parser::m_valid = false;
-        msc_data_group_parser::m_ip_datagram.clear();
+        m_valid = false;
+        m_ip_datagram.clear();
         //TODO set segmentation false
         return pair_complete_vector_t{true, byte_vector_t{}};
         }
       else
         {
-        msc_data_group_parser::m_valid = true;
+        m_valid = true;
         msc_dg_without_crc = parts.first;
         }
       }
     else
       {
-      msc_data_group_parser::m_valid = true;
+      m_valid = true;
       msc_dg_without_crc = msc_data_group;
       }
     if(first_header[7]) //Extension flag
@@ -93,32 +93,32 @@ namespace dabip {
       header_size += msc_dg_without_crc[header_size] & 1111_b;
       }
     auto data_field = split_vector(msc_dg_without_crc, header_size).second;
-    auto ip_datagram = concat_vectors(msc_data_group_parser::m_ip_datagram, data_field);
+    auto ip_datagram = concat_vectors(m_ip_datagram, data_field);
     //Data group type ignored
     std::int8_t continuity_index = msc_data_group[1] << 4;
-    msc_data_group_parser::m_continuity_index_difference = (continuity_index - (msc_data_group_parser::m_last_continuity_index + 1))%16;
-    msc_data_group_parser::m_last_continuity_index = continuity_index;
+    m_continuity_index_difference = (continuity_index - (m_last_continuity_index + 1))%16;
+    m_last_continuity_index = continuity_index;
     //Repetition index ignored
     //Extension field ignored
-    if(msc_data_group_parser::m_segmented)
+    if(m_segmented)
       {
-      concat_vectors_inplace(msc_data_group_parser::m_ip_datagram, ip_datagram);
+      concat_vectors_inplace(m_ip_datagram, ip_datagram);
       return pair_complete_vector_t{false, byte_vector_t{}};
       }
     else
       {
-      msc_data_group_parser::m_ip_datagram.clear();
+      m_ip_datagram.clear();
       return pair_complete_vector_t{true, ip_datagram};
       }
     }
 
   std::uint8_t msc_data_group_parser::no_of_missing_data_groups() const
     {
-    return msc_data_group_parser::m_continuity_index_difference;
+    return m_continuity_index_difference;
     }
 
   bool msc_data_group_parser::is_valid() const
     {
-    return msc_data_group_parser::m_valid;
+    return m_valid;
     }
 }
