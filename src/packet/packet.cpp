@@ -171,8 +171,15 @@ namespace dabip {
         }
       else //Intermediate packet
         {
-        concat_vectors_inplace(m_msc_data_group, useful_data_field);
-        return pair_status_vector_t{parse_status::incomplete, byte_vector_t{}};
+        if(!m_group_valid)
+          {
+          return pair_status_vector_t{parse_status::segment_lost, byte_vector_t{}};
+          }
+        else
+          {
+          concat_vectors_inplace(m_msc_data_group, useful_data_field);
+          return pair_status_vector_t{parse_status::incomplete, byte_vector_t{}};
+          }
         }
       }
 
