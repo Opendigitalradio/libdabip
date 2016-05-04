@@ -1,5 +1,6 @@
 set(LIB_SOURCES util/crc16.cpp
-                packet/packet.cpp
+                packet/packet_generator.cpp
+                packet/packet_parser.cpp
                 msc_data_group/msc_data_group.cpp)
 
 
