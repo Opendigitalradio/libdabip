@@ -45,70 +45,127 @@ namespace dabip {
     return header;
     }
 
-// TODO handle failed CRC ignore group??
+
   pair_status_vector_t msc_data_group_parser::parse(byte_vector_t & msc_data_group)
     {
     byte_vector_t msc_dg_without_crc {msc_data_group};
     std::uint8_t header_size {2};
-    auto first_header = std::bitset<8>{msc_data_group[0]};
-    std::bitset<16> segment_field;
-    if(first_header[6]) //CRC flag
+    auto header_flags = std::bitset<8>{msc_data_group[0]};
+
+    if(m_start_new)
+      {
+      m_group_valid = true;
+      m_ip_datagram.clear();
+      }
+
+    if(header_flags[7]) //Extension flag set
+      {
+      header_size +=2;
+      //Extension field handling not jet implemented
+      }
+
+    if(header_flags[6]) //CRC flag set
       {
       auto parts = split_vector(msc_data_group, msc_data_group.size()-2);
-      if(genCRC16(parts.first)!=parts.second)
+      if(genCRC16(parts.first)==parts.second)
         {
-        m_valid = false;
-        m_ip_datagram.clear();
-        //TODO set segmentation false
-        return pair_status_vector_t{parse_status::invalid_crc, byte_vector_t{}};
+        if(!m_segmented)
+          {
+          m_start_new = true;
+          }
+        msc_dg_without_crc = parts.first;
         }
       else
         {
-        m_valid = true;
-        msc_dg_without_crc = parts.first;
+        m_group_valid = false;
+        m_ip_datagram.clear();
+        return pair_status_vector_t{parse_status::invalid_crc, byte_vector_t{}};
         }
+      }
+
+    if(header_flags[5]) //Segment flag set
+      {
+      std::uint16_t segment_number = (msc_dg_without_crc[header_size] & 01111111_b) << 8 | msc_dg_without_crc[header_size+1];
+      if(!m_start_new && segment_number <= m_last_segment_number)
+        {
+        //Somehow unpredicted a new session started, maybe last segment got lost...
+        m_ip_datagram.clear();
+        //Maybe unusable in the end
+        }
+      if((msc_dg_without_crc[header_size] & 10000000_b) >> 7) //Last flag set
+        {
+        m_segmented = false;
+        m_last_segment_number = 0;
+        // TODO finish segmented path
+        }
+      else //Last flag not set
+        {
+        m_segmented = true;
+        if(segment_number != m_last_segment_number + 1)
+          {
+          m_group_valid = false;
+          return pair_status_vector_t{parse_status::segment_lost, byte_vector_t{}};
+          }
+        m_last_segment_number = segment_number;
+        // TODO finish need more input
+        }
+      header_size += 2;
+      }
+    else //Segment flag not set
+      {
+      m_start_new = true; // TODO think about a more convenient position
+      m_segmented = false;
+      m_group_valid = true;
+      m_ip_datagram.clear();
+      // TODO normal unsegmented path
+      }
+
+
+
+
+
+
+    if(header_flags[4]) //User access flag
+      {
+      header_size += (msc_dg_without_crc[header_size] & 1111_b) + 1;
+      //Ignored apart of header size
+      }
+
+    //Data group type ignored
+
+    std::int8_t continuity_index = msc_data_group[1] >> 4;
+    if(m_last_continuity_index == -1)
+      {
+      m_continuity_index_difference = 1;
       }
     else
       {
-      m_valid = true;
-      msc_dg_without_crc = msc_data_group;
+      m_continuity_index_difference = (continuity_index - m_last_continuity_index)%16;
       }
-    if(first_header[7]) //Extension flag
-      {
-      header_size = 4;
-      }
-    if(first_header[5]) //Segment flag
-      {
-      std::uint16_t segment_field_int = msc_dg_without_crc[header_size] << 8 | msc_dg_without_crc[header_size+1];
-      segment_field = std::bitset<16>{segment_field_int};
-      if(segment_field[15]) //Last segment flag
-        {
-        m_segmented = false;
-        }
-      //TODO track segment number
-      header_size += 2;
-      }
-    if(first_header[4]) //User access flag
-      {
-      header_size += msc_dg_without_crc[header_size] & 1111_b;
-      }
-    auto data_field = split_vector(msc_dg_without_crc, header_size).second;
-    auto ip_datagram = concat_vectors(m_ip_datagram, data_field);
-    //Data group type ignored
-    std::int8_t continuity_index = msc_data_group[1] << 4;
-    m_continuity_index_difference = (continuity_index - (m_last_continuity_index + 1))%16;
     m_last_continuity_index = continuity_index;
+    if(m_continuity_index_difference != 1)
+      {
+      m_group_valid = false;
+      return pair_status_vector_t{parse_status::segment_lost, byte_vector_t{}};
+      }
+
     //Repetition index ignored
-    //Extension field ignored
+
+    auto data_field = split_vector(msc_dg_without_crc, header_size).second;
+    concat_vectors_inplace(m_ip_datagram, data_field);
+
     if(m_segmented)
       {
-      concat_vectors_inplace(m_ip_datagram, ip_datagram);
+      if(m_group_valid)
+        {
+        return pair_status_vector_t{parse_status::segment_lost, byte_vector_t{}};
+        }
       return pair_status_vector_t{parse_status::incomplete, byte_vector_t{}};
       }
     else
       {
-      m_ip_datagram.clear();
-      return pair_status_vector_t{parse_status::ok, ip_datagram};
+      //TODO think about
+      return pair_status_vector_t{parse_status::ok, m_ip_datagram};
       }
     }
 
@@ -119,6 +176,6 @@ namespace dabip {
 
   bool msc_data_group_parser::is_valid() const
     {
-    return m_valid;
+    return m_group_valid;
     }
 }

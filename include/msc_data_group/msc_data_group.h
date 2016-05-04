@@ -60,8 +60,10 @@ namespace dabip
     private:
 
     bool m_segmented {false};
-    bool m_valid {false};
-    std::int8_t m_last_continuity_index {};
+    bool m_start_new {true};
+    bool m_group_valid {false};
+    std::int8_t m_last_continuity_index {-1};
+    std::uint16_t m_last_segment_number {};
     std::uint8_t m_continuity_index_difference {};
     byte_vector_t m_ip_datagram {};
 
