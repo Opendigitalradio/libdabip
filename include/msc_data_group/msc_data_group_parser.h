@@ -1,5 +1,5 @@
-#ifndef __DABIP_MSC_DATA_GROUP__MSC_DATA_GROUP
-#define __DABIP_MSC_DATA_GROUP__MSC_DATA_GROUP
+#ifndef __DABIP_MSC_DATA_GROUP__MSC_DATA_GROUP_PARSER
+#define __DABIP_MSC_DATA_GROUP__MSC_DATA_GROUP_PARSER
 
 #include <cstdint>
 
@@ -7,28 +7,6 @@
 
 namespace dabip
   {
-
-  struct msc_data_group_generator
-    {
-
-    /**
-     * @author Tobias Stauber
-     *
-     * @brief Packs ip_datagram in a msc_data_group
-     * @param ip_datagram An IP datagram of max size 8191 bytes.
-     * @return A MSC data group containing the ip_datagram.
-     */
-    byte_vector_t build(byte_vector_t & ip_datagram);
-
-    private:
-    byte_vector_t build_header();
-
-    byte_vector_t m_last_ip_datagram {};
-    std::uint8_t m_continuity_index {15};
-    std::uint8_t m_repetition_index {};
-  };
-
-
   struct msc_data_group_parser
     {
 
@@ -66,8 +44,6 @@ namespace dabip
     std::uint16_t m_last_segment_number {};
     std::uint8_t m_continuity_index_difference {};
     byte_vector_t m_ip_datagram {};
-
   };
-
 }
-#endif //__DABIP_MSC_DATA_GROUP__MSC_DATA_GROUP
+#endif //__DABIP_MSC_DATA_GROUP__MSC_DATA_GROUP_PARSER

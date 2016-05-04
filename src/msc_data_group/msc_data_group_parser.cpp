@@ -1,7 +1,7 @@
 
 #include <bitset>
 
-#include "msc_data_group/msc_data_group.h"
+#include "msc_data_group/msc_data_group_parser.h"
 #include "util/crc16.h"
 #include "util/vector_helpers.h"
 #include "common/common_types.h"
@@ -12,39 +12,6 @@
 namespace dabip {
 
   using namespace binary;
-
-  byte_vector_t msc_data_group_generator::build_header()
-    {
-    auto header = byte_vector_t(2);
-    header[0]  = 0 << 7;  //Extension flag
-    header[0] |= 1 << 6;  //CRC flag
-    header[0] |= 0 << 5;  //Segmentation flag
-    header[0] |= 0 << 4;  //User access flag
-    header[1]  = constants::kDataGroupTypes[0];    //Data group type
-    header[1] |= m_continuity_index << 4; //Continuity index
-    header[1] |= m_repetition_index;      //Repetition index
-    return header;
-    }
-
-  byte_vector_t msc_data_group_generator::build(byte_vector_t & ip_datagram)
-    {
-    if(ip_datagram != m_last_ip_datagram)
-      {
-      m_continuity_index = (m_continuity_index + 1) % 16;
-      m_repetition_index = 0;
-      }
-    else
-      {
-      m_repetition_index > 0 ? m_repetition_index-- : m_repetition_index = 0;
-      }
-    m_last_ip_datagram = ip_datagram;
-    auto header = build_header();
-    concat_vectors_inplace(header, ip_datagram);
-    auto crc = genCRC16(header);
-    concat_vectors_inplace(header, crc);
-    return header;
-    }
-
 
   pair_status_vector_t msc_data_group_parser::parse(byte_vector_t & msc_data_group)
     {
@@ -96,7 +63,6 @@ namespace dabip {
         {
         m_segmented = false;
         m_last_segment_number = 0;
-        // TODO finish segmented path
         }
       else //Last flag not set
         {
@@ -107,7 +73,6 @@ namespace dabip {
           return pair_status_vector_t{parse_status::segment_lost, byte_vector_t{}};
           }
         m_last_segment_number = segment_number;
-        // TODO finish need more input
         }
       header_size += 2;
       }
@@ -117,13 +82,7 @@ namespace dabip {
       m_segmented = false;
       m_group_valid = true;
       m_ip_datagram.clear();
-      // TODO normal unsegmented path
       }
-
-
-
-
-
 
     if(header_flags[4]) //User access flag
       {

@@ -1,7 +1,8 @@
 set(LIB_SOURCES util/crc16.cpp
                 packet/packet_generator.cpp
                 packet/packet_parser.cpp
-                msc_data_group/msc_data_group.cpp)
+                msc_data_group/msc_data_group_generator.cpp
+                msc_data_group/msc_data_group_parser.cpp)
 
 
 add_library(dab_ip_static STATIC ${LIB_SOURCES})
