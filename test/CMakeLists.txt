@@ -1,4 +1,5 @@
 cute_test(crc16)
-cute_test(msc_data_group)
+cute_test(msc_data_group_generator)
+cute_test(msc_data_group_parser)
 cute_test(packet_generator)
 cute_test(packet_parser)
