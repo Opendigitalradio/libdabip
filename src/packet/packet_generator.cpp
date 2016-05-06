@@ -28,7 +28,7 @@ namespace dabip {
         m_first_last = 00_b;
         }
       auto parts = split_vector(msc_data_group, packet_length);
-      auto hd_packets = assemble(parts.first, packet_length);
+      auto hd_packets = assemble(parts.first, packet_length+5);
       auto tl_packets = build(parts.second);
 
       concat_vectors_inplace(hd_packets, tl_packets);
@@ -108,9 +108,8 @@ namespace dabip {
     {
     auto packets = byte_vector_t(0);
     auto header = build_header(packet_length, msc_data_group.size());
-
     concat_vectors_inplace(packets, header, msc_data_group);
-    concat_vectors_inplace(packets, byte_vector_t(packet_length - 5 -msc_data_group.size(), 0x00)); //Padding
+    concat_vectors_inplace(packets, byte_vector_t(packet_length - 5 - msc_data_group.size(), 0x00)); //Padding
     auto crc = genCRC16(packets);
     concat_vectors_inplace(packets, crc);
     return packets;

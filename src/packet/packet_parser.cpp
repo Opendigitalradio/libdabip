@@ -101,4 +101,18 @@ namespace dabip {
     return m_continuity_index_difference;
     }
 
+  std::vector<byte_vector_t> split_packets(byte_vector_t & packets)
+    {
+    auto local_packets = packets;
+    std::vector<byte_vector_t> splitted {};
+    while( local_packets.size() > 0 )
+      {
+      auto packet_len = ((local_packets[0]>>6)+1)*24;
+      auto parts = split_vector(local_packets, packet_len);
+      local_packets = parts.second;
+      splitted.push_back(parts.first);
+      }
+    return splitted;
+    }
+
 }

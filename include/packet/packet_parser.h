@@ -28,6 +28,7 @@ namespace dabip
      */
     std::uint8_t no_of_missing_packets() const;
 
+
     private:
     std::uint16_t const kAddress;
     std::int8_t m_last_continuity_index {-1};
@@ -35,6 +36,8 @@ namespace dabip
     bool m_group_valid {true};
     byte_vector_t m_msc_data_group {};
     };
+
+  std::vector<byte_vector_t> split_packets(byte_vector_t & packets);
 }
 
 #endif //__DABIP_PACKET__PACKET_PARSER
