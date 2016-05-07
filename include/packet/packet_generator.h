@@ -9,6 +9,12 @@
 namespace dabip
   {
   using namespace binary;
+  /**
+   * @author Tobias Stauber
+   *
+   * @brief A generator for building DAB packets from MSC data groups.
+   *
+   **/
   struct packet_generator
     {
 
@@ -19,6 +25,7 @@ namespace dabip
      *
      * @brief Builds dab packets from msc data group.
      *
+     * @return A byte_vector_t containing one ore more DAB packets.
      *
      */
     byte_vector_t build(byte_vector_t & msc_data_group);
@@ -26,20 +33,24 @@ namespace dabip
     private:
 
     /**
+     * @internal
+     *
      * @author Tobias Stauber
      *
      * @brief Builds dab packet header
      *
-     *
+     * @return The header for the DAB packet.
      */
     byte_vector_t build_header(std::uint8_t const packet_length, std::uint8_t const useful_data_length);
 
     /**
+     * @internal
+     *
      * @author Tobias Stauber
      *
      * @brief Assembles packets
      *
-     *
+     * @return The assembled DAB packet.
      */
     byte_vector_t assemble(byte_vector_t & msc_data_group, std::uint8_t packet_length);
 

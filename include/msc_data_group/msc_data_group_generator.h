@@ -7,6 +7,12 @@
 
 namespace dabip
   {
+  /**
+   * @author Tobias Stauber
+   *
+   * @brief A generator for building MSC data groups from IP packets.
+   *
+   **/
   struct msc_data_group_generator
     {
 
@@ -20,6 +26,15 @@ namespace dabip
     byte_vector_t build(byte_vector_t & ip_datagram);
 
     private:
+
+    /**
+     * @internal
+     *
+     * @author Tobias Stauber
+     *
+     * @brief Generates the MSC data group header.
+     *
+     **/
     byte_vector_t build_header();
 
     byte_vector_t m_last_ip_datagram {};

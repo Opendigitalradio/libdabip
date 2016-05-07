@@ -7,6 +7,12 @@
 
 namespace dabip {
 
+  /**
+   * @author Tobias Stauber
+   *
+   * @param[out] left Vector left concatenated with vector right.
+   * @brief Concatenates right vector to left vector. This alters left vector.
+   */
   template<typename T>
     void concat_vectors_inplace(std::vector<T> & left, std::vector<T> const & right)
       {
@@ -17,6 +23,12 @@ namespace dabip {
         }
       }
 
+  /**
+   * @author Tobias Stauber
+   *
+   * @param[out] first Vector first concatenated with second and third.
+   * @brief Concatenates second vector and third vector to first vector. This alters the first vector.
+   */
   template<typename T>
     void concat_vectors_inplace(std::vector<T> & first, std::vector<T> const & second, std::vector<T> const & third)
       {
@@ -31,6 +43,11 @@ namespace dabip {
         }
       }
 
+  /**
+   * @author Tobias Stauber
+   *
+   * @return A new vector containing the contents of left and right.
+   */
   template<typename T>
     std::vector<T> concat_vectors(std::vector<T> const & left, std::vector<T> const & right)
       {
@@ -46,12 +63,12 @@ namespace dabip {
       return concatenated;
       }
 
+  /**
+   * @author Tobias Stauber
+   *
+   * @return [begin, position] of input as first and ]position, last] of input as second
+   */
   template<typename T>
-    /**
-     * @author Tobias Stauber
-     *
-     * @return [0, position] as first and ]position, input.size()-1]
-     */
     std::pair<std::vector<T>, std::vector<T>> split_vector(std::vector<T> const & input, typename std::vector<T>::size_type const position)
       {
       return std::make_pair<std::vector<T>, std::vector<T>>(std::vector<T>{input.begin(), input.begin()+position}, std::vector<T>{input.begin()+position, input.end()});

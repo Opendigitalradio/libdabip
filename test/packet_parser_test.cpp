@@ -53,5 +53,5 @@ int main(int argc, char * * argv)
   auto xmlFile = cute::xml_file_opener{argc, argv};
   auto listener = cute::xml_listener<cute::ide_listener<>>{xmlFile.out};
 
-  return !cute::makeRunner(listener, argc, argv)(testSuite, "Packets test suite");
+  return !cute::makeRunner(listener, argc, argv)(testSuite, "Packet_parser test suite");
   }

@@ -7,6 +7,12 @@
 
 namespace dabip
   {
+  /**
+   * @author Tobias Stauber
+   *
+   * @brief A parser for MSC data groups.
+   *
+   **/
   struct msc_data_group_parser
     {
 
@@ -15,7 +21,8 @@ namespace dabip
      *
      * @brief Parses msc_data_groups.
      * @param msc_data_group A MSC data group.
-     * @return A flag, if the set of segments is complete as first and if successful, the ip_datagram else an empty byte_vector_t as second.
+     * @return[first] A flag indicating the status of the parser.
+     * @return[second] If first==parse_status::ok the ip_datagram else an empty byte_vector_t.
      */
     pair_status_vector_t parse(byte_vector_t & msc_data_group);
 

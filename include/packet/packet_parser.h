@@ -7,6 +7,12 @@
 
 namespace dabip
   {
+  /**
+   * @author Tobias Stauber
+   *
+   * @brief A parser for DAB packets.
+   *
+   **/
   struct packet_parser
     {
     packet_parser(uint16_t address);
@@ -15,7 +21,9 @@ namespace dabip
      * @author Tobias Stauber
      *
      * @brief parses dab packets
-     * @return A flag, if the set of segments is complete as first and if successful && address==kAddress the msc_data_group else an empty byte_vector_t as second.
+     * @param packet A DAB packet.
+     * @return[first] A flag indicating the status of the parser
+     * @return[second] If first==parse_status::ok the msc_data_group else an empty byte_vector_t.
      */
     pair_status_vector_t parse(byte_vector_t & packet);
 
