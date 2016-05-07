@@ -1,8 +1,7 @@
 DOXYFILE_ENCODING      = UTF-8
 PROJECT_NAME           = libdabip
 PROJECT_NUMBER         = 1.0
-PROJECT_BRIEF          = "A library for building MSC data groups from IP datagrams, parsing IP datagrams from MSC data groups, 
-building DAB packets from MSC data groups and parsing MSC data groups from DAB packets."
+PROJECT_BRIEF          = "A library for building MSC data groups from IP datagrams, parsing IP datagrams from MSC data groups, building DAB packets from MSC data groups and parsing MSC data groups from DAB packets."
 PROJECT_LOGO           =
 OUTPUT_DIRECTORY       = @CMAKE_BINARY_DIR@/doc
 CREATE_SUBDIRS         = YES
