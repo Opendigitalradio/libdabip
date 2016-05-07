@@ -1,0 +1,13 @@
+/**
+ * @namespace dabip
+ * @author Tobias Stauber
+ *
+ * @brief The general libdabip namespace
+ *
+ * This namespace contains everything associated with libdabip. As a
+ * general guideline, we do recommend you use the namespace explicitely
+ * at each callsite. Extensions of the namespace by a client are forbidden
+ * unless explicitely documented otherwise. A program that violates this
+ * rule might experience undefined behavior.
+ *
+ */
