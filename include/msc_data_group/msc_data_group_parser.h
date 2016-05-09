@@ -37,7 +37,7 @@ namespace dabip
     /**
      * @author Tobias Stauber
      *
-     * @return Missed msc_data_group since last fed.
+     * @return Number of missing msc_data_groups since previous fed.
      *
      */
     std::uint8_t no_of_missing_data_groups() const;
