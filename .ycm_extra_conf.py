@@ -35,6 +35,8 @@ flags = [
     'c++',
     '-I',
     scriptPath + '/include',
+    '-isystem',
+    scriptPath + '/third_party/cute',
     '-Wall',
     '-Wextra',
     '-pedantic',
