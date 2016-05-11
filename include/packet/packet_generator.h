@@ -17,7 +17,11 @@ namespace dabip
    **/
   struct packet_generator
     {
-
+    /**
+     * @author Tobias Stauber
+     *
+     * @param address An integer in the interval [1,1023] that specifies the address of the service component.
+     **/
     packet_generator(uint16_t address);
 
     /**

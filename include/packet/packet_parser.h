@@ -15,6 +15,11 @@ namespace dabip
    **/
   struct packet_parser
     {
+    /**
+     * @author Tobias Stauber
+     *
+     * @param address An integer in the interval [1,1023] specifying the address of the service component.
+     **/
     packet_parser(uint16_t address);
 
     /**
