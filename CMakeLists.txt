@@ -45,7 +45,6 @@ set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS} -g")
 set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS} -Os")
 
 include_directories("include")
-include_directories(SYSTEM "third_party/cute")
 
 if(BUILD_DOCUMENTATION_ONLY)
   set(BUILD_DOCUMENTATION ON CACHE BOOL "Build the libdabip documentation." FORCE)
@@ -54,6 +53,7 @@ else()
 
   if(WITH_TESTS)
     include(CUTE)
+    include_directories(SYSTEM "third_party/cute")
     add_subdirectory(test)
   endif()
 endif()
