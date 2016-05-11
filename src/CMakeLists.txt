@@ -4,9 +4,5 @@ set(LIB_SOURCES util/crc16.cpp
                 msc_data_group/msc_data_group_generator.cpp
                 msc_data_group/msc_data_group_parser.cpp)
 
-
-add_library(dab_ip_static STATIC ${LIB_SOURCES})
-add_library(dab_ip SHARED ${LIB_SOURCES})
-
-#add_executable(demo demo.cpp)
-#target_link_libraries(demo dab_ip_static)
+add_library(${PROJECT_NAME}_static STATIC ${LIB_SOURCES})
+add_library(${PROJECT_NAME} SHARED ${LIB_SOURCES})
