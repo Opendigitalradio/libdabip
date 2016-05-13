@@ -1,0 +1,3 @@
+[submodule "libdabcommon"]
+	path = common
+	url = ssh://git@source.dab.arknet.ch:40000/dab-data/libdabcommon.git
