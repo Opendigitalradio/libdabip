@@ -3,6 +3,12 @@ enable_testing()
 set(ENV{CTEST_OUTPUT_ON_FAILURE} "1")
 set(CUTE_TEST_REPORTS_DIRECTORY ${CMAKE_BINARY_DIR}/cute-reports)
 
+if(HAS_PARENT)
+  set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${PROJECT_NAME}/test")
+else()
+  set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/test")
+endif()
+
 if(NOT WIN32)
   string(ASCII 27 ESC)
   set(RST "${ESC}[m")
@@ -29,36 +35,39 @@ function(cute_test TEST_NAME)
   set(TEST_SOURCE_FILE "${TEST_NAME}_test.cpp")
   set(TEST_TARGET_NAME "${TEST_NAME}_test")
 
-  file(STRINGS "${TEST_SOURCE_FILE}" LIBRARIES REGEX "//[ \t]*@CMAKE_CUTE_LIBRARY=.*")
-  file(STRINGS "${TEST_SOURCE_FILE}" DEPENDENCIES REGEX "//[ \t]*@CMAKE_CUTE_DEPENDENCY=.*")
+  if(NOT TARGET ${TEST_TARGET_NAME})
 
-  set(LIBS "")
-  set(DEPS "")
+    file(STRINGS "${TEST_SOURCE_FILE}" LIBRARIES REGEX "//[ \t]*@CMAKE_CUTE_LIBRARY=.*")
+    file(STRINGS "${TEST_SOURCE_FILE}" DEPENDENCIES REGEX "//[ \t]*@CMAKE_CUTE_DEPENDENCY=.*")
 
-  foreach(LIBRARY IN LISTS LIBRARIES)
-    string(REGEX REPLACE "//[ \t]*@CMAKE_CUTE_LIBRARY=(.*)" "\\1" LIBRARY ${LIBRARY})
-    list(APPEND LIBS ${LIBRARY})
-  endforeach()
+    set(LIBS "")
+    set(DEPS "")
 
-  foreach(DEPENDENCY IN LISTS DEPENDENCIES)
-    string(REGEX REPLACE "//[ \t]*@CMAKE_CUTE_DEPENDENCY=(.*)" "\\1" DEPENDENCY ${DEPENDENCY})
-    list(APPEND DEPS "${PROJECT_SOURCE_DIR}/${DEPENDENCY}")
-  endforeach()
+    foreach(LIBRARY IN LISTS LIBRARIES)
+      string(REGEX REPLACE "//[ \t]*@CMAKE_CUTE_LIBRARY=(.*)" "\\1" LIBRARY ${LIBRARY})
+      list(APPEND LIBS ${LIBRARY})
+    endforeach()
 
-  message(STATUS "${BYE}Adding test ${BBL}${TEST_NAME}${RST}")
+    foreach(DEPENDENCY IN LISTS DEPENDENCIES)
+      string(REGEX REPLACE "//[ \t]*@CMAKE_CUTE_DEPENDENCY=(.*)" "\\1" DEPENDENCY ${DEPENDENCY})
+      list(APPEND DEPS "${PROJECT_SOURCE_DIR}/${DEPENDENCY}")
+    endforeach()
 
-  add_executable(${TEST_TARGET_NAME} ${TEST_SOURCE_FILE} ${DEPS})
+    message(STATUS "${BYE}Adding test ${BBL}${TEST_NAME}${RST}")
 
-  if(TARGET ${TEST_TARGET_NAME})
-    target_link_libraries(${TEST_TARGET_NAME} ${LIBS})
-    add_test(NAME ${TEST_TARGET_NAME} WORKING_DIRECTORY ${CUTE_TEST_REPORTS_DIRECTORY} COMMAND ${TEST_TARGET_NAME})
-    if(NOT CUTE_SKIP_RUN_UNIT_TESTS)
-      add_custom_target(cute_${TEST_TARGET_NAME} ALL
-                        COMMAND ctest -R ${TEST_TARGET_NAME} -Q --output-on-failure
-                        DEPENDS ${TEST_TARGET_NAME}
-                        WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
-                        COMMENT "Running CUTE test ${TEST_NAME} ..."
-                        VERBATIM)
-    endif(NOT CUTE_SKIP_RUN_UNIT_TESTS)
+    add_executable(${TEST_TARGET_NAME} ${TEST_SOURCE_FILE} ${DEPS})
+
+    if(TARGET ${TEST_TARGET_NAME})
+      target_link_libraries(${TEST_TARGET_NAME} ${LIBS})
+      add_test(NAME ${TEST_TARGET_NAME} WORKING_DIRECTORY ${CUTE_TEST_REPORTS_DIRECTORY} COMMAND ${TEST_TARGET_NAME})
+      if(NOT CUTE_SKIP_RUN_UNIT_TESTS)
+        add_custom_target(cute_${TEST_TARGET_NAME} ALL
+                          COMMAND ctest -R ${TEST_TARGET_NAME} -Q --output-on-failure
+                          DEPENDS ${TEST_TARGET_NAME}
+                          WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
+                          COMMENT "Running CUTE test ${TEST_NAME} ..."
+                          VERBATIM)
+      endif(NOT CUTE_SKIP_RUN_UNIT_TESTS)
+    endif()
   endif()
 endfunction()
