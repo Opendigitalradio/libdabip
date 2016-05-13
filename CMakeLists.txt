@@ -19,6 +19,8 @@ set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_LIBRARY_OUTPUT_DIRECTORY}" CACHE STR
 
 set(CMAKE_CXX_FLAGS "-std=c++11 -pedantic -Wall -Wextra -Werror")
 
+get_directory_property(HAS_PARENT PARENT_DIRECTORY)
+
 if(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
   option(WITH_ADDRESS_SANITIZER       "Include address/memory checks." OFF)
   option(WITH_UNDEFINED_SANITIZER     "Include undefined behavior checks." OFF)
@@ -77,8 +79,6 @@ if(BUILD_DOCUMENTATION OR BUILD_INTERNAL_DOCUMENTATION)
                     WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
                     COMMENT "Generating API documentation" VERBATIM)
 endif()
-
-get_directory_property(HAS_PARENT PARENT_DIRECTORY)
 
 if(HAS_PARENT)
   set(DABIP_INCLUDES "${CMAKE_CURRENT_SOURCE_DIR}/include;${DABCOMMON_INCLUDES}" PARENT_SCOPE)
