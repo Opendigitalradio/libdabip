@@ -4,10 +4,10 @@
 #include <cstdint>
 #include <vector>
 
-#include "common/common_types.h"
+#include <types/common_types.h>
 
-namespace dab {
-
+namespace dab
+  {
   namespace __internal_dabip
     {
     using namespace types;
@@ -19,6 +19,6 @@ namespace dab {
      **/
     byte_vector_t genCRC16(byte_vector_t const & input);
     }
-}
+  }
 
 #endif

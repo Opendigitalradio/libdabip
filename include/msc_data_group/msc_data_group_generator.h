@@ -3,7 +3,7 @@
 
 #include <cstdint>
 
-#include "common/common_types.h"
+#include <types/common_types.h>
 
 namespace dab
   {

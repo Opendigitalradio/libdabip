@@ -1,11 +1,12 @@
 #include <bitset>
 #include <cstdint>
 
+#include <types/common_types.h>
+#include <literals/binary_literal.h>
+
 #include "util/crc16.h"
 #include "util/vector_helpers.h"
 #include "packet/packet_parser.h"
-#include "common/common_types.h"
-#include "common/common_literals.h"
 #include "constants/packet_constants.h"
 
 namespace dab {

@@ -1,9 +1,10 @@
 #include <cstdint>
 
+#include <types/common_types.h>
+
 #include "util/crc16.h"
 #include "util/vector_helpers.h"
 #include "packet/packet_generator.h"
-#include "common/common_types.h"
 #include "constants/packet_constants.h"
 
 namespace dab

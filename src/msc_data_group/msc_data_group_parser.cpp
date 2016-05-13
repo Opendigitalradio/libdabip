@@ -1,11 +1,11 @@
-
 #include <bitset>
+
+#include <types/common_types.h>
+#include <literals/binary_literal.h>
 
 #include "msc_data_group/msc_data_group_parser.h"
 #include "util/crc16.h"
 #include "util/vector_helpers.h"
-#include "common/common_types.h"
-#include "common/common_literals.h"
 #include "constants/msc_data_group_constants.h"
 
 

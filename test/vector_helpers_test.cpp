@@ -1,5 +1,6 @@
+#include <types/common_types.h>
+
 #include "util/vector_helpers.h"
-#include "common/common_types.h"
 
 #include <cute/cute.h>
 #include <cute/cute_runner.h>

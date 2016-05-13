@@ -3,8 +3,8 @@
 
 #include <cstdint>
 
-#include "common/common_literals.h"
-#include "common/common_types.h"
+#include <literals/binary_literal.h>
+#include <types/common_types.h>
 
 namespace dab
   {

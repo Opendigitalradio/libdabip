@@ -44,11 +44,14 @@ endif()
 set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS} -g")
 set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS} -Os")
 
-include_directories("include")
 
 if(BUILD_DOCUMENTATION_ONLY)
   set(BUILD_DOCUMENTATION ON CACHE BOOL "Build the libdabip documentation." FORCE)
 else()
+  include_directories("include")
+  add_subdirectory("common")
+  include_directories(${DABCOMMON_INCLUDES})
+  link_directories(${DABCOMMON_LIBRARIES_PATH})
   add_subdirectory("src")
 
   if(WITH_TESTS)
