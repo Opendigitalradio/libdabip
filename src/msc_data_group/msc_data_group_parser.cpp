@@ -9,9 +9,11 @@
 #include "constants/msc_data_group_constants.h"
 
 
-namespace dabip {
+namespace dab {
 
-  using namespace binary;
+  using namespace types;
+  using namespace __internal_dabip;
+  using namespace __internal_common::literals;
 
   pair_status_vector_t msc_data_group_parser::parse(byte_vector_t & msc_data_group)
     {
@@ -78,7 +80,7 @@ namespace dabip {
       }
     else //Segment flag not set
       {
-      m_start_new = true; // TODO think about a more convenient position
+      m_start_new = true;
       m_segmented = false;
       m_group_valid = true;
       m_ip_datagram.clear();
@@ -123,7 +125,6 @@ namespace dabip {
       }
     else
       {
-      //TODO think about
       return pair_status_vector_t{parse_status::ok, m_ip_datagram};
       }
     }

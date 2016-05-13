@@ -8,9 +8,11 @@
 #include "common/common_literals.h"
 #include "constants/packet_constants.h"
 
-namespace dabip {
+namespace dab {
 
-  using namespace binary;
+  using namespace __internal_dabip;
+  using namespace __internal_common::literals;
+
   packet_parser::packet_parser(std::uint16_t address): kAddress{address}
     {
     }

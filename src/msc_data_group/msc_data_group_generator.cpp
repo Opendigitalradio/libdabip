@@ -9,9 +9,11 @@
 #include "constants/msc_data_group_constants.h"
 
 
-namespace dabip {
+namespace dab
+  {
 
-  using namespace binary;
+  using namespace types;
+  using namespace __internal_dabip;
 
   byte_vector_t msc_data_group_generator::build_header()
     {
@@ -44,4 +46,4 @@ namespace dabip {
     concat_vectors_inplace(header, crc);
     return header;
     }
-}
+  }

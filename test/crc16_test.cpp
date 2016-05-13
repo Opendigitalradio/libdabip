@@ -1,5 +1,5 @@
 //@CMAKE_CUTE_DEPENDENCY=src/util/crc16.cpp
-//
+
 #include "util/crc16.h"
 
 #include <cute/cute.h>
@@ -8,8 +8,10 @@
 #include <cute/xml_listener.h>
 #include <cute/ide_listener.h>
 
+using namespace dab;
+using namespace dab::types;
+using namespace dab::__internal_dabip;
 
-using namespace dabip;
 void test_matching_crc()
   {
   byte_vector_t input {0x12, 0x34, 0x56, 0x78, 0x90};

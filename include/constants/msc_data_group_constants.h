@@ -3,11 +3,14 @@
 
 #include <cstdint>
 
-namespace dabip
+namespace dab
   {
-  namespace constants
+  namespace __internal_dabip
     {
-    std::uint8_t constexpr kDataGroupTypes[] {0, 1, 2};
+    namespace constants
+      {
+      std::uint8_t constexpr kDataGroupTypes[] {0, 1, 2};
+      }
     }
   }
 

@@ -6,9 +6,10 @@
 #include "common/common_literals.h"
 #include "common/common_types.h"
 
-namespace dabip
+namespace dab
   {
-  using namespace binary;
+  using namespace types;
+  using namespace __internal_common::literals;
   /**
    * @author Tobias Stauber
    *

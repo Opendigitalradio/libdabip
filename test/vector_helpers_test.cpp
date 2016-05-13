@@ -7,14 +7,15 @@
 #include <cute/xml_listener.h>
 #include <cute/ide_listener.h>
 
+using namespace dab::types;
+using namespace dab::__internal_dabip;
 
-using namespace dabip;
 void test_split_vector()
   {
-  byte_vector_t input {0x12, 0x34, 0x56, 0x78, 0x90};
+  auto input = byte_vector_t{0x12, 0x34, 0x56, 0x78, 0x90};
   auto splitted = split_vector(input, 3);
-  byte_vector_t should_first = byte_vector_t{0x12, 0x34, 0x56};
-  byte_vector_t should_second = byte_vector_t{0x78, 0x90};
+  auto should_first = byte_vector_t{0x12, 0x34, 0x56};
+  auto should_second = byte_vector_t{0x78, 0x90};
   ASSERT(splitted.first  == should_first);
   ASSERT(splitted.second == should_second);
   }

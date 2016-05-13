@@ -6,7 +6,9 @@
 #include "common/common_types.h"
 #include "constants/packet_constants.h"
 
-namespace dabip {
+namespace dab
+  {
+  using namespace __internal_dabip;
 
   packet_generator::packet_generator(std::uint16_t address) : kAddress{address}
     {

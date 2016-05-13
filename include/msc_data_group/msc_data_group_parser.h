@@ -5,8 +5,9 @@
 
 #include "common/common_types.h"
 
-namespace dabip
+namespace dab
   {
+  using namespace types;
   /**
    * @author Tobias Stauber
    *

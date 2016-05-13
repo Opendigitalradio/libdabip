@@ -12,10 +12,11 @@
 #include <cute/ide_listener.h>
 
 
-using namespace dabip;
+using namespace dab;
+
 void test_parsing_matches_generated()
   {
-  byte_vector_t input {0x12,0x34,0x56,0x78,0x90};
+  auto input = byte_vector_t{0x12,0x34,0x56,0x78,0x90};
   auto packet_gen = packet_generator(1000);
   auto packets = packet_gen.build(input);
   auto parser = packet_parser(1000);
@@ -28,7 +29,7 @@ void test_parsing_matches_generated()
 
 void test_parsing_matches_generated_long()
   {
-  byte_vector_t input(512, 0x10);
+  auto input = byte_vector_t(512, 0x10);
   auto packet_gen = packet_generator(1000);
   auto packets = packet_gen.build(input);
   auto splitted_packets = split_packets(packets);
