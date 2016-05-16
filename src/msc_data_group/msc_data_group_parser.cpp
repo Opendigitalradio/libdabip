@@ -59,6 +59,7 @@ namespace dab {
         {
         //Somehow unpredicted a new session started, maybe last segment got lost...
         m_ip_datagram.clear();
+        m_group_valid = true;
         //Maybe unusable in the end
         }
       if((msc_dg_without_crc[header_size] & 10000000_b) >> 7) //Last flag set
