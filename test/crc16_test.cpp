@@ -2,6 +2,8 @@
 
 #include "util/crc16.h"
 
+#include <types/common_types.h>
+
 #include <cute/cute.h>
 #include <cute/cute_runner.h>
 #include <cute/cute_suite.h>
@@ -9,7 +11,6 @@
 #include <cute/ide_listener.h>
 
 using namespace dab;
-using namespace dab::types;
 using namespace dab::__internal_dabip;
 
 void test_matching_crc()

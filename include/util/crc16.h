@@ -10,7 +10,6 @@ namespace dab
   {
   namespace __internal_dabip
     {
-    using namespace types;
     /**
      * @author Tobias Stauber
      * @brief Calculates CRC16 of input with initial value 0xFFFF by the polynomial x^16 + x^12 + x^5 + 1.

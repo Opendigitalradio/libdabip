@@ -12,7 +12,6 @@
 namespace dab
   {
 
-  using namespace types;
   using namespace __internal_dabip;
 
   byte_vector_t msc_data_group_generator::build_header()

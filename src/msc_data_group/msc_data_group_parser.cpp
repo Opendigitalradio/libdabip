@@ -11,7 +11,6 @@
 
 namespace dab {
 
-  using namespace types;
   using namespace __internal_dabip;
   using namespace __internal_common::literals;
 

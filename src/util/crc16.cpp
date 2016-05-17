@@ -1,12 +1,13 @@
-#include <algorithm>
+#include "util/crc16.h"
 
-#include <types/common_types.h>
+#include <algorithm>
 
 namespace dab
   {
+
   namespace __internal_dabip
     {
-    using namespace types;
+
     byte_vector_t genCRC16(byte_vector_t const & input)
       {
 

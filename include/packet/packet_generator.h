@@ -8,7 +8,6 @@
 
 namespace dab
   {
-  using namespace types;
   using namespace __internal_common::literals;
   /**
    * @author Tobias Stauber

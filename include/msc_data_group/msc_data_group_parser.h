@@ -7,7 +7,6 @@
 
 namespace dab
   {
-  using namespace types;
   /**
    * @author Tobias Stauber
    *

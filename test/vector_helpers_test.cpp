@@ -8,8 +8,8 @@
 #include <cute/xml_listener.h>
 #include <cute/ide_listener.h>
 
-using namespace dab::types;
 using namespace dab::__internal_dabip;
+using namespace dab;
 
 void test_split_vector()
   {

@@ -8,7 +8,7 @@ endif()
 option(BUILD_DOCUMENTATION          "Build the libdabip documentation." OFF)
 option(BUILD_DOCUMENTATION_ONLY     "Only build the documentation not the libraries." OFF)
 option(BUILD_INTERNAL_DOCUMENTATION "Generate internal developer documentation." OFF)
-option(WITH_TESTS                   "Build and run the unit tests." ON)
+option(WITH_DABIP_TESTS             "Build and run the unit tests." ON)
 option(DOCUMENTATION_FOR_THESIS     "Build the documentation for the thesis with black hyperlinks." OFF)
 
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake/modules")
@@ -53,10 +53,10 @@ if(BUILD_DOCUMENTATION_ONLY)
 else()
   include_directories("include")
   add_subdirectory("common")
-  include_directories(${DABCOMMON_INCLUDES})
+  include_directories(SYSTEM ${DABCOMMON_INCLUDES})
   add_subdirectory("src")
 
-  if(WITH_TESTS)
+  if(WITH_DABIP_TESTS)
     include(CUTE)
     include_directories(SYSTEM "third_party/cute")
     add_subdirectory(test)
@@ -65,7 +65,6 @@ endif()
 
 if(BUILD_DOCUMENTATION OR BUILD_INTERNAL_DOCUMENTATION)
 
-  include_directories("latex")
   if(DOCUMENTATION_FOR_THESIS)
     set(LATEX_HEADER_PREFIX "thesis_")
   else()
@@ -89,10 +88,10 @@ if(BUILD_DOCUMENTATION OR BUILD_INTERNAL_DOCUMENTATION)
                     WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
                     COMMENT "Generating API documentation" VERBATIM)
 
-  add_custom_target(${PROJECT_NAME}_doc_latex_compile ALL make
-                    WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/doc/latex
+  add_custom_target(${PROJECT_NAME}_doc_pdf ALL make pdf &>/dev/null
+                    WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}_doc/latex
                     DEPENDS ${PROJECT_NAME}_doc
-                    COMMENT "Compiling API documentation" VERBATIM)
+                    COMMENT "Compiling API documentation")
 endif()
 
 if(HAS_PARENT)
