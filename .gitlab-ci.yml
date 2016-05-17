@@ -55,28 +55,24 @@ doc-internal:
     - git submodule update --init common
     - cd build
     - cmake .. -DBUILD_DOCUMENTATION_ONLY=ON -DBUILD_INTERNAL_DOCUMENTATION=ON
-    - make
-    - cd doc/latex
-    - make
+    - make dabip_doc_pdf
   tags:
     - x86_64
   artifacts:
     paths:
-      - build/doc/html
-      - build/doc/latex/refman.pdf
+      - build/dabip_doc/html
+      - build/dabip_doc/latex/refman.pdf
 
 doc-public:
   script:
     - git submodule update --init common
     - cd build
     - cmake .. -DBUILD_DOCUMENTATION_ONLY=ON -DBUILD_INTERNAL_DOCUMENTATION=OFF
-    - make
-    - cd doc/latex
-    - make
+    - make dabip_doc_pdf
   tags:
     - x86_64
   artifacts:
     paths:
-      - build/doc/html
-      - build/doc/latex/refman.pdf
+      - build/dabip_doc/html
+      - build/dabip_doc/latex/refman.pdf
 
