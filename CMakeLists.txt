@@ -9,6 +9,7 @@ option(BUILD_DOCUMENTATION          "Build the libdabip documentation." OFF)
 option(BUILD_DOCUMENTATION_ONLY     "Only build the documentation not the libraries." OFF)
 option(BUILD_INTERNAL_DOCUMENTATION "Generate internal developer documentation." OFF)
 option(WITH_TESTS                   "Build and run the unit tests." ON)
+option(DOCUMENTATION_FOR_THESIS     "Build the documentation for the thesis with black hyperlinks." OFF)
 
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake/modules")
 
@@ -63,6 +64,14 @@ else()
 endif()
 
 if(BUILD_DOCUMENTATION OR BUILD_INTERNAL_DOCUMENTATION)
+
+  include_directories("latex")
+  if(DOCUMENTATION_FOR_THESIS)
+    set(LATEX_HEADER_PREFIX "thesis_")
+  else()
+    set(LATEX_HEADER_PREFIX "")
+  endif()
+
   set(GENERATE_INTERNAL_DOCS NO)
 
   if(BUILD_INTERNAL_DOCUMENTATION)
@@ -75,9 +84,15 @@ if(BUILD_DOCUMENTATION OR BUILD_INTERNAL_DOCUMENTATION)
 
   find_package(Doxygen REQUIRED)
   configure_file(${CMAKE_CURRENT_SOURCE_DIR}/Doxyfile.in ${CMAKE_CURRENT_BINARY_DIR}/Doxyfile @ONLY)
-  add_custom_target(doc ALL ${DOXYGEN_EXECUTABLE} ${CMAKE_CURRENT_BINARY_DIR}/Doxyfile
+
+  add_custom_target(${PROJECT_NAME}_doc ALL ${DOXYGEN_EXECUTABLE} ${CMAKE_CURRENT_BINARY_DIR}/Doxyfile
                     WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
                     COMMENT "Generating API documentation" VERBATIM)
+
+  add_custom_target(${PROJECT_NAME}_doc_latex_compile ALL make
+                    WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/doc/latex
+                    DEPENDS ${PROJECT_NAME}_doc
+                    COMMENT "Compiling API documentation" VERBATIM)
 endif()
 
 if(HAS_PARENT)
