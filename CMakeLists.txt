@@ -8,7 +8,7 @@ endif()
 option(BUILD_DOCUMENTATION          "Build the libdabip documentation." OFF)
 option(BUILD_DOCUMENTATION_ONLY     "Only build the documentation not the libraries." OFF)
 option(BUILD_INTERNAL_DOCUMENTATION "Generate internal developer documentation." OFF)
-option(WITH_DABIP_TESTS             "Build and run the unit tests." ON)
+option(WITH_DABIP_TESTS             "Build and run the unit tests." OFF)
 option(DOCUMENTATION_FOR_THESIS     "Build the documentation for the thesis with black hyperlinks." OFF)
 
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake/modules")
@@ -45,8 +45,7 @@ if(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
 endif()
 
 set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS} -g")
-set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS} -Os")
-
+set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS} -O3")
 
 if(BUILD_DOCUMENTATION_ONLY)
   set(BUILD_DOCUMENTATION ON CACHE BOOL "Build the libdabip documentation." FORCE)
