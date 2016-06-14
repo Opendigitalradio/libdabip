@@ -28,6 +28,13 @@ namespace dab {
       }
     auto parts = split_vector(packet, packet.size()-2);
     std::uint8_t useful_data_lenght = packet[2] & 1111111_b;
+
+    auto size_factor = (header_flags[5] << 1) + header_flags[4];
+    if(useful_data_lenght > constants::kPacketDataLengths[size_factor])
+      {
+      return pair_status_vector_t{parse_status::invalid_crc, byte_vector_t{}};
+      }
+
     auto data_field = split_vector(parts.first, 3).second;
     auto useful_data_field = split_vector(data_field, useful_data_lenght).first;
     if(genCRC16(parts.first) != parts.second)
