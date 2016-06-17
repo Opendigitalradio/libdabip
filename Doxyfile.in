@@ -47,7 +47,7 @@ SORT_MEMBERS_CTORS_1ST = YES
 QUIET                  = YES
 WARN_IF_UNDOCUMENTED   = NO
 INPUT                  = @PROJECT_SOURCE_DIR@/include \
-                         @PROJECT_SOURCE_DIR@/doc \
+                         @PROJECT_SOURCE_DIR@/doc
 FILE_PATTERNS          = *.h *.dox
 RECURSIVE              = YES
 REFERENCED_BY_RELATION = YES
