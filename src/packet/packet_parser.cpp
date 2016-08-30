@@ -26,10 +26,14 @@ namespace dab {
       {
       return pair_status_vector_t{parse_status::invalid_address, byte_vector_t{}};
       }
+    auto size_factor = (header_flags[5] << 1) + header_flags[4];
+
+    auto plength = constants::kPacketLengths[size_factor];
+    packet.resize(plength);
+
     auto parts = split_vector(packet, packet.size()-2);
     std::uint8_t useful_data_lenght = packet[2] & 1111111_b;
 
-    auto size_factor = (header_flags[5] << 1) + header_flags[4];
     if(useful_data_lenght > constants::kPacketDataLengths[size_factor])
       {
       return pair_status_vector_t{parse_status::invalid_crc, byte_vector_t{}};
