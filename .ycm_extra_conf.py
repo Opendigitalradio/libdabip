@@ -1,99 +1,262 @@
-# https://gist.github.com/cpradog/aad88d51001ea83ecfc6
+"""
+A simple, dynamic configuration for YouCompleteMe's clang-completer
+
+The variables in the section 'User configuration' allow you to customize paths
+and flags for your project. You can also execute this script using the python
+interpreter, to generate a generic list of flags for you project, which in turn
+can be used by VIM color_coded for example.
+"""
 
 import os
+from os import path as op
 import re
 import subprocess
+import sys
+
 import ycm_core
 
-def LoadSystemIncludes():
-    regex = re.compile(r'(?:\#include \<...\> search starts here\:)(?P<list>.*?)(?:End of search list)', re.DOTALL)
-    process = subprocess.Popen(['clang', '-v', '-E', '-x', 'c++', '-'],
-                               stdin=subprocess.PIPE,
-                               stdout=subprocess.PIPE,
-                               stderr=subprocess.PIPE);
-    process_out, process_err = process.communicate('');
-    output = process_out + process_err;
-    includes = [];
+# User configuration:
 
-    for p in re.search(regex, str(output).encode('utf8').decode('unicode_escape')).group('list').split('\n'):
-        p = p.strip();
-        if len(p) > 0 and p.find('(framework directory)') < 0:
-            includes.append('-isystem');
-            includes.append(p);
+# The language to use ('c' or 'c++')
+LANG = 'c++'
 
-    return includes;
+# The language dialect ('iso' or 'gnu')
+DIALECT = 'iso'
 
-SOURCE_EXTENSIONS = [ '.cpp', '.cxx', '.cc', '.c', '.m', '.mm' ]
-scriptPath = os.path.dirname(os.path.abspath(__file__));
-compilation_database_folder = os.path.join(scriptPath, 'build')
-database = None if not os.path.exists(compilation_database_folder) else ycm_core.CompilationDatabase(compilation_database_folder)
+# The language standard version to use
+# For C use either '89', '90', '99', or '11'
+# For C++ use either '98', '03', '11', '14', or '1z' or '17'
+STD = '11'
 
-flags = [
-    '-Wall',
-    '-std=c++11',
-    '-x',
-    'c++',
-    '-I',
-    scriptPath + '/include',
-    '-isystem',
-    scriptPath + '/third_party/cute',
-    '-isystem',
-    scriptPath + '/common/include',
+# The project root directory
+# Generally the default (the directoy where this script lies) is ok.
+PROJECT_ROOT = op.abspath(op.dirname(__file__))
+
+# The directory containing the 'conanbuildinfo.txt' file, if applicable
+BUILDINFO_DIR = op.join(PROJECT_ROOT, 'build')
+
+# The directory containing the CMake build environment, if applicable
+CMAKE_DIR = BUILDINFO_DIR
+
+# General compiler flags (like warnings, etc.) to use during analysis
+PROJECT_FLAGS = [
     '-Wall',
     '-Wextra',
-    '-pedantic',
-    '-Werror'
+    '-Werror',
+    '-pedantic-errors',
+    '-DCUTE_TESTING',
 ]
 
-systemIncludes = LoadSystemIncludes();
-flags = flags + systemIncludes;
+# Project local include paths
+# Relative paths will be resolved with regard to the PROJECT_ROOT
+# NOTE: Do NOT use '-I' or other option flags, just simple paths
+PROJECT_LOCAL_INCLUDES = [
+    'include',
+]
 
-def MakeRelativePathsInFlagsAbsolute( flags, working_directory ):
-    if not working_directory:
-        return list(flags)
+# Project external include paths
+# Only absolute paths are applicable
+# NOTE: Do NOT use '-I' or other option flags, just simple paths
+PROJECT_EXTERNAL_INCLUDES = [
+]
 
-    new_flags = []
-    make_next_absolute = False
-    path_flags = ['-isystem', '-I', '-iquote', '--sysroot=']
+# Magic from here on out:
 
-    for flag in flags:
-        new_flag = flag
+CLANG_REGEX = re.compile((
+    r'(?:\#include \<...\> search starts here\:)'
+    r'(?P<list>.*?)'
+    r'(?:End of search list)'
+), re.DOTALL)
 
-        if make_next_absolute:
-            make_next_absolute = False
-            if not flag.startswith('/'):
-                new_flag = os.path.join(working_directory, flag)
+STD = (LANG if DIALECT == 'iso' else
+       (DIALECT if LANG == 'c' else DIALECT + '++')) + STD
 
-        for path_flag in path_flags:
-            if flag == path_flag:
-                make_next_absolute = True
-            break
+CLANG_COMMAND = [
+    'clang',
+    '-v',
+    '-E',
+    '-x', LANG,
+    '-std=' + STD,
+    '-'
+]
 
-            if flag.startswith(path_flag):
-                path = flag[len(path_flag):]
-                new_flag = path_flag + os.path.join(working_directory, path)
-                break
+SOURCE_EXTENSIONS = [
+    'cpp',
+    'cc',
+    'cxx',
+    'c++',
+]
 
-        if new_flag:
-            new_flags.append(new_flag)
-    return new_flags
 
-def IsHeaderFile(filename):
-    extension = os.path.splitext(filename)[1]
-    return extension in ['.h', '.hxx', '.hpp', '.hh']
+# pylint: disable=too-few-public-methods
+class ConanBuildInfo():
+    """
+    A simple parser for 'conanbuildinfo.txt' files
+    """
 
-def GetCompilationInfoForFile(filename):
-    if IsHeaderFile(filename):
-        basename = os.path.splitext(filename)[0]
-        for extension in SOURCE_EXTENSIONS:
-            replacement_file = basename + extension
-            if os.path.exists(replacement_file):
-                compilation_info = database.GetCompilationInfoForFile(replacement_file)
-                if compilation_info.compiler_flags_:
-                    return compilation_info
-        return None
-    return database.GetCompilationInfoForFile(filename)
+    def __init__(self):
+        path = op.abspath(op.join(BUILDINFO_DIR, 'conanbuildinfo.txt'))
+        if not op.isfile(path):
+            raise RuntimeError(
+                'Could not find Conan build information at "%s"' % path
+            )
 
+        self._flags = []
+        self._file = open(path, 'r')
+        self._process = self._process_section
+        self._do_parse()
+
+    def _preprocess(self, line):
+        if not line:
+            return False
+        elif line.startswith('['):
+            self._process = self._process_section
+        return True
+
+    def _process_section(self, line):
+        if line == '[includedirs]':
+            self._process = self._process_includedir
+        if line == '[defines]':
+            self._process = self._process_define
+
+    def _process_includedir(self, line):
+        self._flags.append({
+            'flag': '-isystem',
+            'value': op.abspath(line)
+        })
+
+    def _process_define(self, line):
+        self._flags.append({
+            'flag': '-D',
+            'value': line
+        })
+
+    def _do_parse(self):
+        for line in self._file:
+            line = line.strip()
+            if self._preprocess(line):
+                self._process(line)
+
+    @property
+    def flags(self):
+        """
+        Get the compiler flags defined by the 'conanbuildinfo.txt' file
+        """
+        for entry in self._flags:
+            yield entry['flag']
+            yield entry['value']
+
+
+def compiler_includes():
+    """
+    Acquire clangs system include paths
+    """
+    process = subprocess.Popen(CLANG_COMMAND,
+                               stdin=subprocess.PIPE,
+                               stdout=subprocess.PIPE,
+                               stderr=subprocess.PIPE)
+    process_out, process_err = process.communicate('')
+    output = process_out + process_err
+    output = str(output).encode('utf8').decode('unicode_escape')
+    try:
+        for path in re.search(CLANG_REGEX, output).group('list').split('\n'):
+            path = path.strip()
+            if path and path.find('(framework directory)') < 0:
+                yield '-isystem'
+                yield op.abspath(path)
+    except AttributeError:
+        print('Failed to acquire system includes from compiler')
+        print('Tried with the following commandline:\n')
+        print(' '.join(CLANG_COMMAND))
+        sys.exit(1)
+
+
+def project_local_includes():
+    """
+    Process the PROJECT_LOCAL_INCLUDES for delivery to the completer
+
+    Makes sure that all paths are absolute.
+    """
+    paths = iter(PROJECT_LOCAL_INCLUDES)
+    for path in paths:
+        yield '-I'
+        if not op.isabs(path):
+            yield op.abspath(op.join(PROJECT_ROOT, path))
+        else:
+            yield path
+
+
+def project_external_includes():
+    """
+    Process the PROJECT_EXTERNAL_INCLUDES for delivery to the completer
+
+    Prevents relative paths.
+    """
+    paths = iter(PROJECT_EXTERNAL_INCLUDES)
+    for path in paths:
+        if not op.isabs(path):
+            raise RuntimeError('Expected absolute path for external headers')
+        yield '-I'
+        yield op.abspath(path)
+
+
+def cmake_flags(file):
+    """
+    Generate the flags for the given file based on CMake information
+    """
+    db = ycm_core.CompilationDatabase(CMAKE_DIR)
+    if not db.DatabaseSuccessfullyLoaded():
+        return []
+
+    parts = op.splitext(file)
+    filename = parts[0]
+    extension = parts[1]
+    if extension in ['.h', '.hpp', '.hxx', '.hh']:
+        file = op.basename(filename)
+        for root, _, files in os.walk(PROJECT_ROOT):
+            for ext in SOURCE_EXTENSIONS:
+                candidate = file + '.' + ext
+                if candidate in files:
+                    file = op.join(PROJECT_ROOT, root, candidate)
+    info = db.GetCompilationInfoForFile(file)
+    if info.compiler_flags_:
+        return info.compiler_flags_
+    return []
+
+
+def configuration_flags(filename):
+    """
+    Generate the flags based on the configuration
+    """
+    flags = [
+        '-x',
+        LANG,
+        '-std=' + STD,
+    ]
+
+    flags += PROJECT_FLAGS
+    flags += compiler_includes()
+    flags += project_local_includes()
+    flags += project_external_includes()
+    flags += cmake_flags(filename)
+
+    try:
+        flags += ConanBuildInfo().flags
+    except RuntimeError:
+        pass
+
+    return flags
+
+
+# pylint: disable=C0103
+# pylint: disable=W0613
 def FlagsForFile(filename, **kwargs):
-    final_flags = MakeRelativePathsInFlagsAbsolute(flags, scriptPath)
-    return { 'flags': final_flags, 'do_cache': True }
+    """
+    Calculate the compiler flags for the given file
+    """
+    return {'flags': configuration_flags(filename), 'do_cache': True}
+
+
+if __name__ == '__main__':
+    for flag in FlagsForFile('')['flags']:
+        print(flag)
