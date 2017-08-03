@@ -1,14 +1,12 @@
-#ifndef __DABIP_PACKET__PACKET_GENERATOR
-#define __DABIP_PACKET__PACKET_GENERATOR
+#ifndef DABIP_PACKET_PACKET_GENERATOR
+#define DABIP_PACKET_PACKET_GENERATOR
+
+#include <dab/types/common_types.h>
 
 #include <cstdint>
 
-#include <literals/binary_literal.h>
-#include <types/common_types.h>
-
 namespace dab
   {
-  using namespace __internal_common::literals;
   /**
    * @author Tobias Stauber
    *
@@ -60,10 +58,10 @@ namespace dab
 
     void set_first_last();
 
-    std::uint8_t m_first_last = 11_b;
+    std::uint8_t m_first_last = 3;
     std::uint16_t const kAddress;
     std::uint8_t m_continuity_index {};
     };
 }
 
-#endif //__DABIP_PACKET__PACKET_GENERATOR
+#endif

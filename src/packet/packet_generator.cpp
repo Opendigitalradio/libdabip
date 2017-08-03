@@ -1,15 +1,18 @@
+#include "dab/util/crc16.h"
+#include "dab/util/vector_helpers.h"
+#include "dab/packet/packet_generator.h"
+#include "dab/constants/packet_constants.h"
+
+#include <dab/types/common_types.h>
+#include <dab/literals/binary_literal.h>
+
 #include <cstdint>
-
-#include <types/common_types.h>
-
-#include "util/crc16.h"
-#include "util/vector_helpers.h"
-#include "packet/packet_generator.h"
-#include "constants/packet_constants.h"
 
 namespace dab
   {
-  using namespace __internal_dabip;
+
+  using namespace internal;
+  using namespace literals;
 
   packet_generator::packet_generator(std::uint16_t address) : kAddress{address}
     {

@@ -1,3 +1,0 @@
-[submodule "libdabcommon"]
-	path = common
-	url = https://github.com/Opendigitalradio/libdabcommon.git

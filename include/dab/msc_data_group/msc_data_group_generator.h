@@ -1,12 +1,13 @@
-#ifndef __DABIP_MSC_DATA_GROUP__MSC_DATA_GROUP_GENERATOR
-#define __DABIP_MSC_DATA_GROUP__MSC_DATA_GROUP_GENERATOR
+#ifndef DABIP_MSC_DATA_GROUP_MSC_DATA_GROUP_GENERATOR
+#define DABIP_MSC_DATA_GROUP_MSC_DATA_GROUP_GENERATOR
 
 #include <cstdint>
 
-#include <types/common_types.h>
+#include <dab/types/common_types.h>
 
 namespace dab
   {
+
   /**
    * @author Tobias Stauber
    *
@@ -15,7 +16,6 @@ namespace dab
    **/
   struct msc_data_group_generator
     {
-
     /**
      * @author Tobias Stauber
      *
@@ -41,5 +41,7 @@ namespace dab
     std::uint8_t m_continuity_index {15};
     std::uint8_t m_repetition_index {};
   };
+
 }
-#endif //__DABIP_MSC_DATA_GROUP__MSC_DATA_GROUP_GENERATOR
+
+#endif

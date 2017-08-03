@@ -1,12 +1,13 @@
-#ifndef __DABIP_PACKET__PACKET_PARSER
-#define __DABIP_PACKET__PACKET_PARSER
+#ifndef DABIP_PACKET_PACKET_PARSER
+#define DABIP_PACKET_PACKET_PARSER
+
+#include <dab/types/common_types.h>
 
 #include <cstdint>
 
-#include <types/common_types.h>
-
 namespace dab
   {
+
   /**
    * @author Tobias Stauber
    *
@@ -51,6 +52,7 @@ namespace dab
     };
 
   std::vector<byte_vector_t> split_packets(byte_vector_t & packets);
-}
 
-#endif //__DABIP_PACKET__PACKET_PARSER
+  }
+
+#endif

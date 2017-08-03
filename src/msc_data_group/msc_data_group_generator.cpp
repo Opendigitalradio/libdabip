@@ -1,18 +1,17 @@
+#include "dab/msc_data_group/msc_data_group_generator.h"
+#include "dab/util/crc16.h"
+#include "dab/util/vector_helpers.h"
+#include "dab/constants/msc_data_group_constants.h"
+
+#include <dab/types/common_types.h>
+#include <dab/literals/binary_literal.h>
+
 #include <bitset>
-
-#include <types/common_types.h>
-#include <literals/binary_literal.h>
-
-#include "msc_data_group/msc_data_group_generator.h"
-#include "util/crc16.h"
-#include "util/vector_helpers.h"
-#include "constants/msc_data_group_constants.h"
-
 
 namespace dab
   {
 
-  using namespace __internal_dabip;
+  using namespace internal;
 
   byte_vector_t msc_data_group_generator::build_header()
     {

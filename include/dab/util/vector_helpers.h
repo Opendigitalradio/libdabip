@@ -1,5 +1,5 @@
-#ifndef __DABIP_UTIL__VECTOR_HELPERS
-#define __DABIP_UTIL__VECTOR_HELPERS
+#ifndef DABIP_UTIL_VECTOR_HELPERS
+#define DABIP_UTIL_VECTOR_HELPERS
 
 #include <vector>
 #include <utility>
@@ -8,7 +8,7 @@
 namespace dab
   {
 
-  namespace __internal_dabip
+  namespace internal
     {
     /**
      * @author Tobias Stauber
@@ -77,6 +77,7 @@ namespace dab
         return std::make_pair<std::vector<T>, std::vector<T>>(std::vector<T>{input.begin(), input.begin()+position}, std::vector<T>{input.begin()+position, input.end()});
         }
     }
+
   }
 
-#endif // __DABIP_UTIL__VECTOR_HELPERS
+#endif

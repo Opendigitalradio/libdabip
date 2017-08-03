@@ -1,18 +1,18 @@
+#include "dab/util/crc16.h"
+#include "dab/util/vector_helpers.h"
+#include "dab/packet/packet_parser.h"
+#include "dab/constants/packet_constants.h"
+
+#include <dab/types/common_types.h>
+#include <dab/literals/binary_literal.h>
+
 #include <bitset>
 #include <cstdint>
 
-#include <types/common_types.h>
-#include <literals/binary_literal.h>
-
-#include "util/crc16.h"
-#include "util/vector_helpers.h"
-#include "packet/packet_parser.h"
-#include "constants/packet_constants.h"
-
 namespace dab {
 
-  using namespace __internal_dabip;
-  using namespace __internal_common::literals;
+  using namespace internal;
+  using namespace literals;
 
   packet_parser::packet_parser(std::uint16_t address): kAddress{address}
     {

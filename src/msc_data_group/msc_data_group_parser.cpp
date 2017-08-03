@@ -1,18 +1,17 @@
+#include "dab/msc_data_group/msc_data_group_parser.h"
+#include "dab/util/crc16.h"
+#include "dab/util/vector_helpers.h"
+#include "dab/constants/msc_data_group_constants.h"
+
+#include <dab/types/common_types.h>
+#include <dab/literals/binary_literal.h>
+
 #include <bitset>
-
-#include <types/common_types.h>
-#include <literals/binary_literal.h>
-
-#include "msc_data_group/msc_data_group_parser.h"
-#include "util/crc16.h"
-#include "util/vector_helpers.h"
-#include "constants/msc_data_group_constants.h"
-
 
 namespace dab {
 
-  using namespace __internal_dabip;
-  using namespace __internal_common::literals;
+  using namespace internal;
+  using namespace literals;
 
   pair_status_vector_t msc_data_group_parser::parse(byte_vector_t & msc_data_group)
     {

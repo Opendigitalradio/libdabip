@@ -1,9 +1,9 @@
-#ifndef __DABIP_MSC_DATA_GROUP__MSC_DATA_GROUP_PARSER
-#define __DABIP_MSC_DATA_GROUP__MSC_DATA_GROUP_PARSER
+#ifndef DABIP_MSC_DATA_GROUP_MSC_DATA_GROUP_PARSER
+#define DABIP_MSC_DATA_GROUP_MSC_DATA_GROUP_PARSER
 
 #include <cstdint>
 
-#include <types/common_types.h>
+#include <dab/types/common_types.h>
 
 namespace dab
   {
@@ -52,5 +52,7 @@ namespace dab
     std::uint8_t m_continuity_index_difference {};
     byte_vector_t m_ip_datagram {};
   };
+
 }
-#endif //__DABIP_MSC_DATA_GROUP__MSC_DATA_GROUP_PARSER
+
+#endif

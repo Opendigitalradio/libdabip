@@ -1,14 +1,14 @@
-#ifndef __DABIP_UTIL__CRC_16
-#define __DABIP_UTIL__CRC_16
+#ifndef DABIP_UTIL_CRC_16
+#define DABIP_UTIL_CRC_16
+
+#include <dab/types/common_types.h>
 
 #include <cstdint>
 #include <vector>
 
-#include <types/common_types.h>
-
 namespace dab
   {
-  namespace __internal_dabip
+  namespace internal
     {
     /**
      * @author Tobias Stauber
