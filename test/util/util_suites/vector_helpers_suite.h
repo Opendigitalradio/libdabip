@@ -29,50 +29,65 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include "dab/msc_data_group/msc_data_group_generator.h"
-#include "dab/util/crc16.h"
+#ifndef DABIP_TEST_UTIL_VECTOR_HELPERS_TESTS
+#define DABIP_TEST_UTIL_VECTOR_HELPERS_TESTS
+
 #include "dab/util/vector_helpers.h"
-#include "dab/constants/msc_data_group_constants.h"
 
-#include <dab/types/common_types.h>
-#include <dab/literals/binary_literal.h>
-
-#include <bitset>
+#include <cute/cute.h>
+#include <cute/cute_suite.h>
+#include <cutex/descriptive_suite.h>
 
 namespace dab
   {
 
-  using namespace internal;
-
-  byte_vector_t msc_data_group_generator::build_header()
+  namespace test
     {
-    auto header = byte_vector_t(2);
-    header[0]  = 0 << 7;  //Extension flag
-    header[0] |= 1 << 6;  //CRC flag
-    header[0] |= 0 << 5;  //Segmentation flag
-    header[0] |= 0 << 4;  //User access flag
-    header[1]  = constants::kDataGroupTypes[0];    //Data group type
-    header[1] |= m_continuity_index << 4; //Continuity index
-    header[1] |= m_repetition_index;      //Repetition index
-    return header;
+
+    namespace ip
+      {
+
+      namespace util
+        {
+
+        CUTE_DESCRIPTIVE_STRUCT(vector_helpers_tests)
+          {
+#define LOCAL_TEST(Test) CUTE_SMEMFUN(vector_helpers_tests, Test)
+          static cute::suite suite()
+            {
+            return {
+              LOCAL_TEST(split),
+            };
+            }
+#undef LOCAL_TEST
+
+          void split()
+            {
+            auto const input = byte_vector_t{
+              0x12, 0x34, 0x56, 0x78, 0x90,
+            };
+
+            auto const expectedFirst = byte_vector_t{
+              0x12, 0x34, 0x56
+            };
+            auto const expectedSecond = byte_vector_t{
+              0x78, 0x90
+            };
+
+            auto parts = dab::internal::split_vector(input, 3);
+
+            ASSERT_EQUAL(expectedFirst, parts.first);
+            ASSERT_EQUAL(expectedSecond, parts.second);
+            }
+
+          };
+
+        }
+
+      }
+
     }
 
-  byte_vector_t msc_data_group_generator::build(byte_vector_t & ip_datagram)
-    {
-    if(ip_datagram != m_last_ip_datagram)
-      {
-      m_continuity_index = (m_continuity_index + 1) % 16;
-      m_repetition_index = 0;
-      }
-    else
-      {
-      m_repetition_index > 0 ? m_repetition_index-- : m_repetition_index = 0;
-      }
-    m_last_ip_datagram = ip_datagram;
-    auto header = build_header();
-    concat_vectors_inplace(header, ip_datagram);
-    auto crc = genCRC16(header);
-    concat_vectors_inplace(header, crc);
-    return header;
-    }
   }
+
+#endif

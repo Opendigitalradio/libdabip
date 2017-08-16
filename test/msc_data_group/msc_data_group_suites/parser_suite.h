@@ -29,50 +29,73 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include "dab/msc_data_group/msc_data_group_generator.h"
-#include "dab/util/crc16.h"
-#include "dab/util/vector_helpers.h"
-#include "dab/constants/msc_data_group_constants.h"
+#ifndef DABIP_TEST_MSC_DATA_GROUP_PARSER_TESTS
+#define DABIP_TEST_MSC_DATA_GROUP_PARSER_TESTS
 
-#include <dab/types/common_types.h>
-#include <dab/literals/binary_literal.h>
+#include "dab/msc_data_group/msc_data_group_parser.h"
 
-#include <bitset>
+#include <cute/cute.h>
+#include <cute/cute_suite.h>
+#include <cutex/descriptive_suite.h>
 
 namespace dab
   {
 
-  using namespace internal;
-
-  byte_vector_t msc_data_group_generator::build_header()
+  namespace test
     {
-    auto header = byte_vector_t(2);
-    header[0]  = 0 << 7;  //Extension flag
-    header[0] |= 1 << 6;  //CRC flag
-    header[0] |= 0 << 5;  //Segmentation flag
-    header[0] |= 0 << 4;  //User access flag
-    header[1]  = constants::kDataGroupTypes[0];    //Data group type
-    header[1] |= m_continuity_index << 4; //Continuity index
-    header[1] |= m_repetition_index;      //Repetition index
-    return header;
+
+    namespace ip
+      {
+
+      namespace msc_data_group
+        {
+
+        CUTE_DESCRIPTIVE_STRUCT(parser_tests)
+          {
+#define LOCAL_TEST(Test) CUTE_SMEMFUN(parser_tests, Test)
+          static cute::suite suite()
+            {
+            return {
+              LOCAL_TEST(datagram_unwrapping),
+            };
+            }
+#undef LOCAL_TEST
+
+          void datagram_unwrapping()
+            {
+            byte_vector_t wrapped {
+              0x40, 0x00, 0x45, 0x00, 0x00, 0x27, 0x00, 0x01,
+              0x00, 0x00, 0x40, 0x11, 0x0c, 0xa7, 0xc0, 0xa8,
+              0x01, 0x75, 0xac, 0x00, 0x00, 0x01, 0x22, 0xb8,
+              0x22, 0xb8, 0x00, 0x13, 0xdd, 0x1e, 0x54, 0x65,
+              0x73, 0x74, 0x6d, 0x65, 0x73, 0x73, 0x61, 0x67,
+              0x65, 0xc6, 0x89,
+            };
+
+            byte_vector_t const expected {
+              0x45, 0x00, 0x00, 0x27, 0x00, 0x01, 0x00, 0x00,
+              0x40, 0x11, 0x0c, 0xa7, 0xc0, 0xa8, 0x01, 0x75,
+              0xac, 0x00, 0x00, 0x01, 0x22, 0xb8, 0x22, 0xb8,
+              0x00, 0x13, 0xdd, 0x1e, 0x54, 0x65, 0x73, 0x74,
+              0x6d, 0x65, 0x73, 0x73, 0x61, 0x67, 0x65,
+            };
+
+            auto result = m_parser.parse(wrapped);
+
+            ASSERT_EQUAL(parse_status::ok, result.first);
+            ASSERT_EQUAL(expected, result.second);
+            }
+
+          private:
+            msc_data_group_parser m_parser{};
+          };
+
+        }
+
+      }
+
     }
 
-  byte_vector_t msc_data_group_generator::build(byte_vector_t & ip_datagram)
-    {
-    if(ip_datagram != m_last_ip_datagram)
-      {
-      m_continuity_index = (m_continuity_index + 1) % 16;
-      m_repetition_index = 0;
-      }
-    else
-      {
-      m_repetition_index > 0 ? m_repetition_index-- : m_repetition_index = 0;
-      }
-    m_last_ip_datagram = ip_datagram;
-    auto header = build_header();
-    concat_vectors_inplace(header, ip_datagram);
-    auto crc = genCRC16(header);
-    concat_vectors_inplace(header, crc);
-    return header;
-    }
   }
+
+#endif

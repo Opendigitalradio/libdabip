@@ -1,7 +1,0 @@
-/**
- * @namespace dabip::binary
- * @author Tobias Stauber
- *
- * @brief This namespace contains a user defined literal for binary values.
- *
- */

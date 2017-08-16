@@ -29,50 +29,79 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include "dab/msc_data_group/msc_data_group_generator.h"
-#include "dab/util/crc16.h"
-#include "dab/util/vector_helpers.h"
-#include "dab/constants/msc_data_group_constants.h"
+#ifndef DABIP_TEST_PACKET_PARSER_TESTS
+#define DABIP_TEST_PACKET_PARSER_TESTS
 
-#include <dab/types/common_types.h>
-#include <dab/literals/binary_literal.h>
+#include "dab/packet/packet_parser.h"
 
-#include <bitset>
+#include <cute/cute.h>
+#include <cute/cute_suite.h>
+#include <cutex/descriptive_suite.h>
 
 namespace dab
   {
 
-  using namespace internal;
-
-  byte_vector_t msc_data_group_generator::build_header()
+  namespace test
     {
-    auto header = byte_vector_t(2);
-    header[0]  = 0 << 7;  //Extension flag
-    header[0] |= 1 << 6;  //CRC flag
-    header[0] |= 0 << 5;  //Segmentation flag
-    header[0] |= 0 << 4;  //User access flag
-    header[1]  = constants::kDataGroupTypes[0];    //Data group type
-    header[1] |= m_continuity_index << 4; //Continuity index
-    header[1] |= m_repetition_index;      //Repetition index
-    return header;
+
+    namespace ip
+      {
+
+      namespace packet
+        {
+
+        CUTE_DESCRIPTIVE_STRUCT(parser_tests)
+          {
+#define LOCAL_TEST(Test) CUTE_SMEMFUN(parser_tests, Test)
+          static cute::suite suite()
+            {
+            return {
+              LOCAL_TEST(assemble),
+              LOCAL_TEST(assemble_long),
+            };
+            }
+#undef LOCAL_TEST
+
+          void assemble()
+            {
+            auto input = byte_vector_t{
+              0x12, 0x34, 0x56, 0x78, 0x90
+            };
+            auto packets = m_generator.build(input);
+            auto result = m_parser.parse(packets);
+
+            ASSERT_EQUAL(parse_status::ok, result.first);
+            ASSERT_EQUAL(input, result.second);
+            }
+
+
+          void assemble_long()
+            {
+            auto input = byte_vector_t(512, 0x10);
+            auto packets = m_generator.build(input);
+            auto splitPackets = split_packets(packets);
+
+            std::pair<parse_status, byte_vector_t> result;
+            for (byte_vector_t packet : splitPackets)
+              {
+              result = m_parser.parse(packet);
+              }
+
+            ASSERT_EQUAL(parse_status::ok, result.first);
+            ASSERT_EQUAL(input, result.second);
+            }
+
+          private:
+            packet_generator m_generator{1000};
+            packet_parser m_parser{1000};
+          };
+
+        }
+
+      }
+
     }
 
-  byte_vector_t msc_data_group_generator::build(byte_vector_t & ip_datagram)
-    {
-    if(ip_datagram != m_last_ip_datagram)
-      {
-      m_continuity_index = (m_continuity_index + 1) % 16;
-      m_repetition_index = 0;
-      }
-    else
-      {
-      m_repetition_index > 0 ? m_repetition_index-- : m_repetition_index = 0;
-      }
-    m_last_ip_datagram = ip_datagram;
-    auto header = build_header();
-    concat_vectors_inplace(header, ip_datagram);
-    auto crc = genCRC16(header);
-    concat_vectors_inplace(header, crc);
-    return header;
-    }
   }
+
+#endif

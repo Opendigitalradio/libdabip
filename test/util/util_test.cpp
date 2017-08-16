@@ -29,50 +29,27 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include "dab/msc_data_group/msc_data_group_generator.h"
-#include "dab/util/crc16.h"
-#include "dab/util/vector_helpers.h"
-#include "dab/constants/msc_data_group_constants.h"
+#include "util_suites/crc16_suite.h"
+#include "util_suites/vector_helpers_suite.h"
 
-#include <dab/types/common_types.h>
-#include <dab/literals/binary_literal.h>
+#include <cute/cute_runner.h>
+#include <cute/cute_suite.h>
+#include <cute/xml_listener.h>
+#include <cute/ide_listener.h>
+#include <cutex/descriptive_suite.h>
 
-#include <bitset>
-
-namespace dab
+int main(int argc, char * * argv)
   {
+  auto && xmlFile = cute::xml_file_opener{argc, argv};
+  auto && listener = cute::xml_listener<cute::ide_listener<>>{xmlFile.out};
 
-  using namespace internal;
+  auto success = true;
+  auto && runner = cute::makeRunner(listener, argc, argv);
 
-  byte_vector_t msc_data_group_generator::build_header()
-    {
-    auto header = byte_vector_t(2);
-    header[0]  = 0 << 7;  //Extension flag
-    header[0] |= 1 << 6;  //CRC flag
-    header[0] |= 0 << 5;  //Segmentation flag
-    header[0] |= 0 << 4;  //User access flag
-    header[1]  = constants::kDataGroupTypes[0];    //Data group type
-    header[1] |= m_continuity_index << 4; //Continuity index
-    header[1] |= m_repetition_index;      //Repetition index
-    return header;
-    }
+  using namespace dab::test::ip::util;
 
-  byte_vector_t msc_data_group_generator::build(byte_vector_t & ip_datagram)
-    {
-    if(ip_datagram != m_last_ip_datagram)
-      {
-      m_continuity_index = (m_continuity_index + 1) % 16;
-      m_repetition_index = 0;
-      }
-    else
-      {
-      m_repetition_index > 0 ? m_repetition_index-- : m_repetition_index = 0;
-      }
-    m_last_ip_datagram = ip_datagram;
-    auto header = build_header();
-    concat_vectors_inplace(header, ip_datagram);
-    auto crc = genCRC16(header);
-    concat_vectors_inplace(header, crc);
-    return header;
-    }
+  success &= cute::extensions::runSelfDescriptive<crc16_tests>(runner);
+  success &= cute::extensions::runSelfDescriptive<vector_helpers_tests>(runner);
+
+  return !success;
   }
