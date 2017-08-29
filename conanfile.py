@@ -4,7 +4,7 @@ from conans import ConanFile, CMake
 
 class LibDABIPConan(ConanFile):
     name = 'libdabip'
-    version = '1.0.1'
+    version = '1.0.2'
     description = (
         'The DAB IP encoding/decoding infrastructure of the ODR DAB data '
         'toolkit, that provides types and functions to wrap IP datagrams for '
@@ -37,18 +37,13 @@ class LibDABIPConan(ConanFile):
     )
 
     def build(self):
-        dabip_test = '-DDABIP_ENABLE_TESTS=%s' % (
+        cmake = CMake(self, parallel=True)
+        cmake.definitions['EXTERNAL_DEPS_VIA'] = 'conan'
+        cmake.definitions['DABIP_ENABLE_TESTS'] = (
             'On' if self.options.test
             else 'Off'
         )
-
-        cmake = CMake(self, parallel=True)
-        cmake.configure(
-            source_dir=self.conanfile_directory,
-            args=[
-                dabip_test,
-            ]
-        )
+        cmake.configure()
         cmake.build()
         cmake.install()
 

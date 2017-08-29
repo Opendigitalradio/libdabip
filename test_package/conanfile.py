@@ -8,7 +8,7 @@ from conans import ConanFile, CMake
 
 class DABIPTestConan(ConanFile):
     name = 'libdabip package test'
-    version = '1.0.1'
+    version = '1.0.2'
     description = 'The Conan.io package test for libdabip'
     settings = (
         'arch',

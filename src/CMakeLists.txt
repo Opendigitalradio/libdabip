@@ -13,7 +13,6 @@ target_link_libraries(${LIBRARY_NAME}
   )
 
 install(TARGETS ${LIBRARY_NAME}
-  EXPORT ${PROJECT_NAME}
   ARCHIVE DESTINATION lib
   LIBRARY DESTINATION lib
   )
