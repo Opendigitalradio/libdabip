@@ -12,7 +12,9 @@ target_link_libraries(${LIBRARY_NAME}
   ${LIBRARY_NAME}_iface
   )
 
-install(TARGETS ${LIBRARY_NAME}
-  ARCHIVE DESTINATION lib
-  LIBRARY DESTINATION lib
-  )
+if(NOT ${${PROJECT_NAME}_UPPER}_HAS_PARENT)
+  install(TARGETS ${LIBRARY_NAME}
+    ARCHIVE DESTINATION lib
+    LIBRARY DESTINATION lib
+    )
+endif()
